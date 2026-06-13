@@ -15,29 +15,50 @@ include(cmake/variables.cmake)
 
 # ---- Declare library ----
 
-add_library(
-    DicomViewer_lib OBJECT
-    source/lib.cpp
-)
-
-target_include_directories(
-    DicomViewer_lib ${warning_guard}
-    PUBLIC
-    "\$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/source>"
-)
-
-target_compile_features(DicomViewer_lib PUBLIC cxx_std_17)
-
 # ---- Declare executable ----
+find_package(Qt6 REQUIRED COMPONENTS Widgets)
 
-add_executable(DicomViewer_exe source/main.cpp)
+set(DCMTK_DIR "/opt/dcmtk/lib/cmake/dcmtk")  
+set(VTK_DIR "/usr/local/lib/cmake/vtk-9.6")  
+find_package(DCMTK REQUIRED)
+find_package(VTK REQUIRED COMPONENTS  
+  CommonCore  
+  CommonDataModel  
+  IOImage  
+  ImagingCore  
+  RenderingCore  
+  RenderingOpenGL2  
+  RenderingVolumeOpenGL2  
+  InteractionStyle  
+  RenderingQt  
+)
+
+qt_standard_project_setup()
+
+execute_process(COMMAND python gen_src.py)  
+include(source_list.cmake)
+
+add_executable(DicomViewer_exe ${SRC})
 add_executable(DicomViewer::exe ALIAS DicomViewer_exe)
 
 set_property(TARGET DicomViewer_exe PROPERTY OUTPUT_NAME DicomViewer)
 
 target_compile_features(DicomViewer_exe PRIVATE cxx_std_17)
 
-target_link_libraries(DicomViewer_exe PRIVATE DicomViewer_lib)
+target_link_libraries(DicomViewer_exe  
+   PRIVATE  
+     Qt6::Widgets  
+     DCMTK::DCMTK  
+     VTK::CommonCore  
+     VTK::CommonDataModel  
+     VTK::IOImage  
+     VTK::ImagingCore  
+     VTK::RenderingCore  
+     VTK::RenderingOpenGL2  
+     VTK::RenderingVolumeOpenGL2  
+     VTK::InteractionStyle  
+     VTK::RenderingQt  
+)
 
 # ---- Install rules ----
 
