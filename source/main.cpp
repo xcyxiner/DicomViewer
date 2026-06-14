@@ -1,10 +1,15 @@
-#include <iostream>
-#include <string>
+#include <QApplication>
 
+#include "GUICenter.h"
+#include "GUIWindow.h"
+#include "qapplication.h"
 
-auto main() -> int
+auto main(int argc, char* argv[]) -> int
 {
-  auto const message = "Hello world !";
-  std::cout << message << '\n';
-  return 0;
+  QApplication application(argc, argv);
+  GUIWindow window;
+  GUICenter center;
+  window.setContent(&center);
+  window.show();
+  return application.exec();
 }

@@ -5,16 +5,29 @@ This is the DicomViewer project.
 ## 目标
 读取并显示DICM格式
 
+## 参考资料
+
+### 项目参考
+[Asclepios-DICOM-Viewer](https://github.com/GavriloviciEduard/Asclepios-DICOM-Viewer)
+
+### 测试数据
+[dicom-test-files.git](https://github.com/robyoung/dicom-test-files.git)
+
 ## 依赖
+
+```
 系统 ubuntu 24.04
 qt6.4
 依赖dcmtk vtk vtk-dicom(gdcm)
 参考 [dcmtk vtk vtk-dicom(gdcm) 编译](https://juejin.cn/post/7650428235189108779)
+```
 
 ## IDE以及开发环境
+```
 win11
 wsl2
 nvim
+```
 
 # Building and installing
 See the [BUILDING](BUILDING.md) document.
