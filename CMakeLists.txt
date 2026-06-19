@@ -42,6 +42,7 @@ add_executable(DicomViewer_exe ${SRC})
 add_executable(DicomViewer::exe ALIAS DicomViewer_exe)
 
 set_property(TARGET DicomViewer_exe PROPERTY OUTPUT_NAME DicomViewer)
+target_include_directories(DicomViewer_exe PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/source)
 
 target_compile_features(DicomViewer_exe PRIVATE cxx_std_17)
 

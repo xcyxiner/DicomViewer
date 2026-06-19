@@ -3,8 +3,8 @@
 
 #include "GUIWindow.h"
 
-#include "FileMenu.h"
-#include "GUICenter.h"
+#include "gui/GUICenter.h"
+#include "menu/FileMenu.h"
 
 GUIWindow::GUIWindow(QWidget* parent)
     : QMainWindow(parent)

@@ -3,10 +3,10 @@
 
 #include "FileMenu.h"
 
-#include "GUIWindow.h"
 #include "qaction.h"
 #include "qkeysequence.h"
 #include "qmenu.h"
+#include "window/GUIWindow.h"
 
 FileMenu::FileMenu(QMenuBar* menuBar, QWidget* parent)
     : QMenu(parent)
