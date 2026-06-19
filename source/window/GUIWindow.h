@@ -2,7 +2,7 @@
 #pragma once
 #include <QMainWindow>
 
-#include "FileMenu.h"
+#include "menu/FileMenu.h"
 #include "qtmetamacros.h"
 #include "qwidget.h"
 
