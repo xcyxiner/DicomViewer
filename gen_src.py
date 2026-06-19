@@ -3,7 +3,7 @@ import os
 src = []
 for root, _, files in os.walk("source"):
     for f in files:
-        if f.endswith(".cpp"):
+        if f.endswith((".cpp",".h")):
             src.append(os.path.join(root, f))
 
 with open("source_list.cmake", "w") as f:
