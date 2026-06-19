@@ -1,6 +1,25 @@
 set(SRC
     source/main.cpp
     source/window/GUIWindow.cpp
+    source/window/GUIWindow.h
     source/menu/FileMenu.cpp
+    source/menu/FileMenu.h
+    source/lib/FilesImporter.h
+    source/lib/FilesImporter.cpp
+    source/core/controller/CoreController.cpp
+    source/core/controller/CoreController.h
+    source/core/lib/DicomReader.h
+    source/core/lib/DicomReader.cpp
+    source/core/model/Image.cpp
+    source/core/model/Series.cpp
+    source/core/model/Study.cpp
+    source/core/model/Patient.cpp
+    source/core/model/Series.h
+    source/core/model/Study.h
+    source/core/model/CoreRepository.h
+    source/core/model/Image.h
+    source/core/model/CoreRepository.cpp
+    source/core/model/Patient.h
     source/gui/GUICenter.cpp
+    source/gui/GUICenter.h
 )
