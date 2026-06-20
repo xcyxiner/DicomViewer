@@ -1,15 +1,18 @@
 
 #include <cstdlib>
+#include <memory>
 #include <mutex>
 
 #include "FilesImporter.h"
 
+#include "core/controller/CoreController.h"
 #include "qglobal.h"
 #include "qobject.h"
 
 FilesImporter::FilesImporter(QObject* parent)
     : QThread(Q_NULLPTR)
 {
+  m_coreController = std::make_unique<CoreController>();
 }
 
 void FilesImporter::startImporter()
@@ -44,4 +47,11 @@ void FilesImporter::addFiles(const QStringList& t_paths)
   }
 }
 
-void FilesImporter::importFiles() {}
+void FilesImporter::importFiles()
+{
+  while (!m_filesPaths.empty() && m_isWorking) {
+    std::lock_guard<QMutex> lock(m_filesMutex);
+    m_coreController->readData(m_filesPaths.front().toStdString());
+    m_filesPaths.pop_front();
+  }
+}
