@@ -27,4 +27,11 @@ void CoreController::readData(const std::string& t_filePath) const
   }
 }
 
-void CoreController::insertDataInRepo() const {}
+void CoreController::insertDataInRepo() const
+{
+  m_coreRepository->resetLastPatient();
+  m_coreRepository->addPatient(m_dicomReader->getReadPatient());
+  m_coreRepository->addStudy(m_dicomReader->getReadStudy());
+  m_coreRepository->addSeries(m_dicomReader->getReadSeries());
+  if (m_coreRepository->getLastSeries()) {}
+}
