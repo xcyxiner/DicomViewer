@@ -1,0 +1,35 @@
+{
+  "name": "dicom-viewer",
+  "version": "1.0.0",
+  "dependencies": [
+    {
+      "name": "qtbase",
+      "default-features": false,
+      "features": ["widgets", "gui", "network", "sql"]
+    },
+    {
+      "name": "dcmtk"
+    },
+    {
+      "name": "gdcm"
+    },
+    {
+      "name": "vtk"
+    },
+    {
+      "name": "vtk-dicom",
+      "default-features": false,
+      "features": ["gdcm"]
+    }
+  ],
+
+  "builtin-baseline": "a0400024711b283056538ac19ced80b91a83c24c",
+  "overrides": [
+    { "name": "qtbase",    "version": "6.5.3", "port-version": 0 },
+    { "name": "dcmtk",       "version": "3.6.7", "port-version": 0 },
+    { "name": "gdcm",        "version": "3.0.24","port-version": 0 },
+    { "name": "vtk",         "version": "9.2.0-pv5.11.0", "port-version": 0 },
+    { "name": "vtk-dicom",   "version": "0.8.17","port-version": 0 }
+  ],
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json"
+}
