@@ -62,6 +62,22 @@ target_link_libraries(DicomViewer_exe
      VTK::DICOM
 )
 
+# ---------- Windows: 自动 windeployqt ----------
+option(DEPLOY_QT_PLUGINS "Auto-copy Qt platform plugins after build" OFF)
+if(WIN32 AND MSVC AND DEPLOY_QT_PLUGINS)
+    set(_qt_debug_bin "${CMAKE_BINARY_DIR}/vcpkg_installed/x64-windows/debug/bin")
+    set(_qt_debug_plugins "${CMAKE_BINARY_DIR}/vcpkg_installed/x64-windows/debug/Qt6/plugins")
+
+    add_custom_command(TARGET DicomViewer_exe POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory
+            $<TARGET_FILE_DIR:DicomViewer_exe>/platforms
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${_qt_debug_plugins}/platforms/qwindowsd.dll"
+            $<TARGET_FILE_DIR:DicomViewer_exe>/platforms/qwindowsd.dll
+        COMMENT "Copying qwindowsd.dll (Debug)"
+    )
+endif()
+
 # ---- Install rules ----
 
 if(NOT CMAKE_SKIP_INSTALL_RULES)
