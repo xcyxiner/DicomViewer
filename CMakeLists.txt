@@ -16,10 +16,8 @@ include(cmake/variables.cmake)
 # ---- Declare library ----
 
 # ---- Declare executable ----
-find_package(Qt6 REQUIRED COMPONENTS Widgets)
+find_package(Qt6 REQUIRED COMPONENTS Widgets OpenGLWidgets)
 
-set(DCMTK_DIR "/opt/dcmtk/lib/cmake/dcmtk")  
-set(VTK_DIR "/usr/local/lib/cmake/vtk-9.6")  
 find_package(DCMTK REQUIRED)
 find_package(VTK REQUIRED COMPONENTS  
   CommonCore  
@@ -32,6 +30,7 @@ find_package(VTK REQUIRED COMPONENTS
   InteractionStyle  
   RenderingQt  
 )
+find_package(dicom CONFIG REQUIRED)
 
 qt_standard_project_setup()
 
@@ -43,15 +42,13 @@ add_executable(DicomViewer::exe ALIAS DicomViewer_exe)
 
 set_property(TARGET DicomViewer_exe PROPERTY OUTPUT_NAME DicomViewer)
 target_include_directories(DicomViewer_exe PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/source)
-target_include_directories(DicomViewer_exe PRIVATE
-  /opt/dcmtk/include
-)
 
 target_compile_features(DicomViewer_exe PRIVATE cxx_std_17)
 
 target_link_libraries(DicomViewer_exe  
    PRIVATE  
-     Qt6::Widgets  
+     Qt6::Widgets
+     Qt6::OpenGLWidgets
      DCMTK::DCMTK  
      VTK::CommonCore  
      VTK::CommonDataModel  
@@ -61,15 +58,8 @@ target_link_libraries(DicomViewer_exe
      VTK::RenderingOpenGL2  
      VTK::RenderingVolumeOpenGL2  
      VTK::InteractionStyle  
-     VTK::RenderingQt  
-     DCMTK::ofstd
-     DCMTK::oflog
-     DCMTK::dcmdata
-     DCMTK::dcmimgle
-     DCMTK::dcmimage
-     DCMTK::dcmjpeg
-     DCMTK::dcmnet
-     DCMTK::dcmsr
+     VTK::RenderingQt
+     VTK::DICOM
 )
 
 # ---- Install rules ----
