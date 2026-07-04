@@ -5,8 +5,16 @@
     {
       "name": "qtbase",
       "default-features": false,
-      "features": ["widgets","gui","opengl"]
+      "features": ["widgets","gui","opengl","xcb"],
+      "platform":"linux"
     },
+    {
+      "name": "qtbase",
+      "default-features": false,
+      "features": ["widgets","gui","opengl"],
+      "platform":"windows"
+    },
+
     {
       "name": "dcmtk"
     },
@@ -28,6 +36,10 @@
   "builtin-baseline": "a0400024711b283056538ac19ced80b91a83c24c",
   "overrides": [
     { "name": "qtbase",    "version": "6.8.3", "port-version": 5 },
+    { "name": "qtdeclarative",    "version": "6.8.3", "port-version": 0 },
+    { "name": "qtlanguageserver",    "version": "6.8.3", "port-version": 0 },
+    { "name": "qtshadertools",    "version": "6.8.3", "port-version": 0 },
+    { "name": "qtsvg",    "version": "6.8.3", "port-version": 0 },
     { "name": "dcmtk",       "version": "3.6.7", "port-version": 0 },
     { "name": "gdcm",        "version": "3.0.24","port-version": 0 },
     { "name": "vtk",         "version": "9.3.0-pv5.12.1", "port-version": 17 },

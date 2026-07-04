@@ -78,6 +78,34 @@ if(WIN32 AND MSVC AND DEPLOY_QT_PLUGINS)
     )
 endif()
 
+# ============================================================
+# 自动部署 Qt 字体（仅 Linux + Debug）
+# ============================================================
+option(AUTO_DEPLOY_FONTS "Auto copy system fonts for Qt (Linux/Debug only)" OFF)
+if(AUTO_DEPLOY_FONTS AND UNIX)
+    # Qt 会找这个路径
+    set(QT_FONT_DEST "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-linux/debug/lib/fonts")
+    if(NOT EXISTS "${QT_FONT_DEST}")
+        file(MAKE_DIRECTORY "${QT_FONT_DEST}")
+        # 系统字体来源（Ubuntu 默认路径）
+        set(SYSTEM_FONT_DIR "/usr/share/fonts/truetype/dejavu")
+        if(EXISTS "${SYSTEM_FONT_DIR}")
+            file(GLOB DEJAVU_FONTS "${SYSTEM_FONT_DIR}/*.ttf")
+            foreach(FONT ${DEJAVU_FONTS})
+                file(COPY "${FONT}" DESTINATION "${QT_FONT_DEST}")
+                message(STATUS "  Deployed font: ${FONT}")
+            endforeach()
+            message(STATUS "✅ Deployed DejaVu fonts to ${QT_FONT_DEST}")
+        else()
+            message(WARNING "⚠️ DejaVu fonts not found at ${SYSTEM_FONT_DIR}")
+            message(WARNING "  Install with: sudo apt install fonts-dejavu-core")
+        endif()
+    else()
+        message(STATUS "Qt fonts already deployed at ${QT_FONT_DEST}")
+    endif()
+endif()
+
+
 # ---- Install rules ----
 
 if(NOT CMAKE_SKIP_INSTALL_RULES)
