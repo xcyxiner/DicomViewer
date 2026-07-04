@@ -1,6 +1,7 @@
 set(SRC
     source/main.cpp
     source/window/GUIWindow.cpp
+    source/window/GUIWindow.ui
     source/window/GUIWindow.h
     source/menu/FileMenu.cpp
     source/menu/FileMenu.h
