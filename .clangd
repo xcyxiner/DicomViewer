@@ -1,0 +1,11 @@
+CompileFlags:
+  Add:
+    - "-I/home/ubuntu/xcyxiner/DicomViewer/vcpkg_installed/x64-linux/include/Qt6"
+    - "-I/home/ubuntu/xcyxiner/DicomViewer/vcpkg_installed/x64-linux/include/Qt6/QtWidgets"
+    - "-I/home/ubuntu/xcyxiner/DicomViewer/vcpkg_installed/x64-linux/include/Qt6/QtCore"
+    - "-I/home/ubuntu/xcyxiner/DicomViewer/vcpkg_installed/x64-linux/include/Qt6/QtGui"
+    - "-I/home/ubuntu/xcyxiner/DicomViewer/vcpkg_installed/x64-linux/include"
+    - "-I/home/ubuntu/xcyxiner/DicomViewer/vcpkg_installed/x64-linux/include/vtk-9.3"
+    - "-I/home/ubuntu/xcyxiner/DicomViewer/source"
+    - "-I/home/ubuntu/xcyxiner/DicomViewer/build/DicomViewer_exe_autogen/include"
+  CompilationDatabase: build/dev
