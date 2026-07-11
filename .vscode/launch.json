@@ -1,0 +1,24 @@
+{
+    // 使用 IntelliSense 了解相关属性。 
+    // 悬停以查看现有属性的描述。
+    // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "DicomViewer_exe",
+            "type": "cppdbg",
+            "request": "launch",
+            // 1. 确保这里指向了正确的可执行文件
+            "program": "${command:cmake.launchTargetPath}",
+            "args": [],
+            "stopAtEntry": false,
+            // 2. 【关键修改】告诉 GDB 不要在 VS Code 集成的黑框框里硬抢控制权
+            "externalConsole": false, // 关闭 VS Code 内置终端
+            "console": "externalTerminal", // 核心改动：强制使用外部终端（如 Windows CMD/PowerShell）
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb", // 确保这里路径正确
+        }
+    ]
+}

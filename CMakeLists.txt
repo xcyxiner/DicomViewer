@@ -34,7 +34,10 @@ find_package(dicom CONFIG REQUIRED)
 
 qt_standard_project_setup()
 
-execute_process(COMMAND python gen_src.py)  
+execute_process(
+    COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/gen_src.py
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}  # <-- 关键：指定工作目录为源码目录
+)  
 include(source_list.cmake)
 
 add_executable(DicomViewer_exe ${SRC})
