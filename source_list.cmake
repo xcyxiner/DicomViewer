@@ -1,26 +1,20 @@
 set(SRC
     source/main.cpp
-    source/window/GUIWindow.cpp
-    source/window/GUIWindow.ui
-    source/window/GUIWindow.h
-    source/menu/FileMenu.cpp
-    source/menu/FileMenu.h
-    source/lib/FilesImporter.h
-    source/lib/FilesImporter.cpp
-    source/core/controller/CoreController.cpp
-    source/core/controller/CoreController.h
-    source/core/lib/DicomReader.h
-    source/core/lib/DicomReader.cpp
-    source/core/model/Image.cpp
-    source/core/model/Series.cpp
-    source/core/model/Study.cpp
-    source/core/model/Patient.cpp
-    source/core/model/Series.h
-    source/core/model/Study.h
-    source/core/model/CoreRepository.h
-    source/core/model/Image.h
-    source/core/model/CoreRepository.cpp
-    source/core/model/Patient.h
-    source/gui/GUICenter.cpp
-    source/gui/GUICenter.h
+    source/presentation/view/window/GUIWindow.cpp
+    source/presentation/view/window/GUIWindow.ui
+    source/presentation/view/window/GUIWindow.h
+    source/presentation/view/menu/FileMenu.cpp
+    source/presentation/view/menu/FileMenu.h
+    source/presentation/view/gui/GUICenter.cpp
+    source/presentation/view/gui/GUICenter.h
+    source/domain/model/Image.cpp
+    source/domain/model/Series.cpp
+    source/domain/model/Study.cpp
+    source/domain/model/Patient.cpp
+    source/domain/model/Series.h
+    source/domain/model/Study.h
+    source/domain/model/CoreRepository.h
+    source/domain/model/Image.h
+    source/domain/model/CoreRepository.cpp
+    source/domain/model/Patient.h
 )

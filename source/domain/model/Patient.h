@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-#include "core/model/Study.h"
+#include "domain/model/Study.h"
 
 class Patient
 {

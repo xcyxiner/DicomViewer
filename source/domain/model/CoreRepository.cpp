@@ -4,7 +4,7 @@
 
 #include "CoreRepository.h"
 
-#include "core/model/Patient.h"
+#include "domain/model/Patient.h"
 
 CoreRepository::CoreRepository() {}
 

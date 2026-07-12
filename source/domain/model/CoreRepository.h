@@ -5,10 +5,10 @@
 #include <memory>
 #include <vector>
 
-#include "core/model/Image.h"
-#include "core/model/Patient.h"
-#include "core/model/Series.h"
-#include "core/model/Study.h"
+#include "domain/model/Image.h"
+#include "domain/model/Patient.h"
+#include "domain/model/Series.h"
+#include "domain/model/Study.h"
 
 class CoreRepository
 {

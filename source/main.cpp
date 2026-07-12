@@ -1,8 +1,8 @@
 #include <QApplication>
 
-#include "gui/GUICenter.h"
+#include "presentation/view/gui/GUICenter.h"
 #include "qapplication.h"
-#include "window/GUIWindow.h"
+#include "presentation/view/window/GUIWindow.h"
 
 auto main(int argc, char* argv[]) -> int
 {

@@ -3,8 +3,8 @@
 
 #include "GUIWindow.h"
 
-#include "gui/GUICenter.h"
-#include "menu/FileMenu.h"
+#include "presentation/view/gui/GUICenter.h"
+#include "presentation/view/menu/FileMenu.h"
 #include "ui_GUIWindow.h"
 
 GUIWindow::GUIWindow(QWidget* parent)
