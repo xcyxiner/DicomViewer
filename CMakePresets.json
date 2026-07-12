@@ -23,7 +23,8 @@
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_CXX_FLAGS": "",
         "CMAKE_PREFIX_PATH": "${sourceDir}/vcpkg_installed/x64-linux/debug;${sourceDir}/vcpkg_installed/x64-linux",
-        "AUTO_DEPLOY_FONTS":"ON"
+        "AUTO_DEPLOY_FONTS":"ON",
+        "AUTO_TESTING":"ON"
       },
       "condition": {
         "type": "equals",

@@ -40,6 +40,16 @@ execute_process(
 )  
 include(source_list.cmake)
 
+add_library(dicom_core STATIC
+    ${SRC}
+)
+
+target_include_directories(dicom_core PUBLIC
+    ${CMAKE_SOURCE_DIR}/source
+)
+
+
+
 add_executable(DicomViewer_exe ${SRC})
 add_executable(DicomViewer::exe ALIAS DicomViewer_exe)
 
@@ -47,6 +57,23 @@ set_property(TARGET DicomViewer_exe PROPERTY OUTPUT_NAME DicomViewer)
 target_include_directories(DicomViewer_exe PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/source)
 
 target_compile_features(DicomViewer_exe PRIVATE cxx_std_17)
+
+target_link_libraries(dicom_core  
+   PRIVATE  
+     Qt6::Widgets
+     Qt6::OpenGLWidgets
+     DCMTK::DCMTK  
+     VTK::CommonCore  
+     VTK::CommonDataModel  
+     VTK::IOImage  
+     VTK::ImagingCore  
+     VTK::RenderingCore  
+     VTK::RenderingOpenGL2  
+     VTK::RenderingVolumeOpenGL2  
+     VTK::InteractionStyle  
+     VTK::RenderingQt
+     VTK::DICOM
+)
 
 target_link_libraries(DicomViewer_exe  
    PRIVATE  
@@ -116,6 +143,12 @@ if(NOT CMAKE_SKIP_INSTALL_RULES)
 endif()
 
 # ---- Developer mode ----
+option(AUTO_TESTING "Enable automatic testing" OFF)
+if(AUTO_TESTING)
+    enable_testing()
+    add_subdirectory(test)
+endif()
+
 
 if(NOT DicomViewer_DEVELOPER_MODE)
   return()

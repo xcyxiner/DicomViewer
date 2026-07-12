@@ -19,6 +19,26 @@
             "environment": [],
             "MIMode": "gdb",
             "miDebuggerPath": "/usr/bin/gdb", // 确保这里路径正确
+        },
+        {
+            "name": "Debug DcmtkReader_test",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/test/DcmtkReader_test",
+            "args": [],
+            "stopAtEntry": false,
+            "externalConsole": false,
+            "cwd": "${workspaceFolder}/build/test",
+            "environment": [],
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
         }
     ]
 }

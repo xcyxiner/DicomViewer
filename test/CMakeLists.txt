@@ -1,17 +1,18 @@
-# Parent project does not export its library target, so this CML implicitly
-# depends on being added from it, i.e. the testing is done only from the build
-# tree and is not feasible from an install location
 
-project(DicomViewerTests LANGUAGES CXX)
 
-# ---- Tests ----
+find_package(GTest CONFIG REQUIRED)
 
-add_executable(DicomViewer_test source/DicomViewer_test.cpp)
-target_link_libraries(DicomViewer_test PRIVATE DicomViewer_lib)
-target_compile_features(DicomViewer_test PRIVATE cxx_std_17)
+# 3. 编译测试可执行文件
+add_executable(DcmtkReader_test
+    DcmtkReader_test.cpp
+)
 
-add_test(NAME DicomViewer_test COMMAND DicomViewer_test)
+# 4. 测试程序链接「测试专用库」
+target_link_libraries(DcmtkReader_test PRIVATE
+    GTest::gtest_main
+    dicom_core
+)
 
-# ---- End-of-file commands ----
-
-add_folders(Test)
+# 5. 注册测试
+include(GoogleTest)
+gtest_discover_tests(DcmtkReader_test)

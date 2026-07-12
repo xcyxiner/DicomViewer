@@ -7,10 +7,16 @@ set(SRC
     source/presentation/view/menu/FileMenu.h
     source/presentation/view/gui/GUICenter.cpp
     source/presentation/view/gui/GUICenter.h
+    source/infrastructure/dicom_io/IDicomReader.h
+    source/infrastructure/dicom_io/DcmtkReader.cpp
+    source/infrastructure/dicom_io/DcmtkReader.h
+    source/infrastructure/dicom_io/IDicomReader.cpp
+    source/domain/model/Frame.h
     source/domain/model/Image.cpp
     source/domain/model/Series.cpp
     source/domain/model/Study.cpp
     source/domain/model/Patient.cpp
+    source/domain/model/Frame.cpp
     source/domain/model/Series.h
     source/domain/model/Study.h
     source/domain/model/CoreRepository.h
