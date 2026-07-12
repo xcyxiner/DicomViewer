@@ -3,7 +3,7 @@
 #include <QWidget>
 #include <memory>
 
-#include "lib/FilesImporter.h"
+
 #include "qglobal.h"
 #include "qtmetamacros.h"
 
@@ -21,5 +21,4 @@ signals:
   void addFiles(const QStringList& t_paths);
 
 private:
-  std::unique_ptr<FilesImporter> m_fileImporter;
 };

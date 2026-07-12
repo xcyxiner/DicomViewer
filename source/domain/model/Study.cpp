@@ -5,7 +5,7 @@
 
 #include "Study.h"
 
-#include "core/model/Series.h"
+#include "domain/model/Series.h"
 
 Study::Study() {}
 
