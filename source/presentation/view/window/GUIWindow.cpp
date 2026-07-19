@@ -35,7 +35,6 @@ m_renderWindow->AddRenderer(renderer);
   m_vtkWidget->setRenderWindow(m_renderWindow);
 // 4. 添加到布局（resize(400,300)会被布局覆盖，建议省略或设置最小尺寸）
 ui->layout->addWidget(m_vtkWidget);
-
 }
 
 void GUIWindow::showEvent(QShowEvent* event) {
@@ -50,7 +49,7 @@ void GUIWindow::showEvent(QShowEvent* event) {
   actor->SetMapper(mapper);
   renderer->AddActor(actor);
   renderer->ResetCamera();
-  m_vtkWidget->update(); // 或调用 renderWindow->Render()
+ renderer->GetRenderWindow()->Render();
   }
 }
 
