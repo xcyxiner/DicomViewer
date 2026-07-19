@@ -5,7 +5,11 @@
     {
       "name": "qtbase",
       "default-features": false,
-      "features": ["widgets","gui","opengl","xcb"],
+      "features": ["widgets","gui","opengl","xcb","egl"],
+      "platform":"linux"
+    },
+    {
+      "name": "qtwayland",
       "platform":"linux"
     },
     {
@@ -37,6 +41,7 @@
   "builtin-baseline": "a0400024711b283056538ac19ced80b91a83c24c",
   "overrides": [
     { "name": "qtbase",    "version": "6.8.3", "port-version": 5 },
+    {"name": "qtwayland", "version": "6.8.3", "port-version": 0 },
     { "name": "qtdeclarative",    "version": "6.8.3", "port-version": 0 },
     { "name": "qtlanguageserver",    "version": "6.8.3", "port-version": 0 },
     { "name": "qtshadertools",    "version": "6.8.3", "port-version": 0 },

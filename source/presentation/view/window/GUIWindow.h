@@ -5,7 +5,9 @@
 #include "presentation/view/menu/FileMenu.h"
 #include "qtmetamacros.h"
 #include "qwidget.h"
-
+#include <QVTKOpenGLNativeWidget.h>
+#include <vtkGenericOpenGLRenderWindow.h>
+#include <vtkRenderer.h>
 namespace Ui
 {
 class GUIWindow;
@@ -21,7 +23,9 @@ public:
 public:
   void setContent(QWidget* t_widget);
   void openFile();
+  void initvtkTest();
 
+  void showEvent(QShowEvent *event) override;
 private:
   void createMenu();
 
@@ -31,4 +35,7 @@ private:
   FileMenu* m_fileMenu;
 
   std::unique_ptr<Ui::GUIWindow> ui;
+
+   vtkSmartPointer<vtkRenderer> renderer;
+   QVTKOpenGLNativeWidget* m_vtkWidget;
 };

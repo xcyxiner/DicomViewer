@@ -20,15 +20,20 @@ find_package(Qt6 REQUIRED COMPONENTS Widgets OpenGLWidgets)
 
 find_package(DCMTK REQUIRED)
 find_package(VTK REQUIRED COMPONENTS  
+  GUISupportQt  
   CommonCore  
-  CommonDataModel  
+  CommonDataModel 
+  FiltersCore 
   IOImage  
-  ImagingCore  
-  RenderingCore  
+  ImagingColor
+  ImagingCore
+  ImagingGeneral
+  ImagingMath  
+  RenderingCore
   RenderingOpenGL2  
   RenderingVolumeOpenGL2  
   InteractionStyle  
-  RenderingQt  
+  RenderingQt 
 )
 find_package(dicom CONFIG REQUIRED)
 
@@ -63,10 +68,14 @@ target_link_libraries(dicom_core
      Qt6::Widgets
      Qt6::OpenGLWidgets
      DCMTK::DCMTK  
+     VTK::GUISupportQt  
      VTK::CommonCore  
-     VTK::CommonDataModel  
+     VTK::CommonDataModel
+     VTK::FiltersCore  
      VTK::IOImage  
-     VTK::ImagingCore  
+     VTK::ImagingColor
+     VTK::ImagingCore
+     VTK::ImagingGeneral
      VTK::RenderingCore  
      VTK::RenderingOpenGL2  
      VTK::RenderingVolumeOpenGL2  
@@ -80,10 +89,14 @@ target_link_libraries(DicomViewer_exe
      Qt6::Widgets
      Qt6::OpenGLWidgets
      DCMTK::DCMTK  
+     VTK::GUISupportQt  
      VTK::CommonCore  
-     VTK::CommonDataModel  
+     VTK::CommonDataModel
+     VTK::FiltersCore  
      VTK::IOImage  
-     VTK::ImagingCore  
+     VTK::ImagingColor
+     VTK::ImagingCore
+     VTK::ImagingGeneral 
      VTK::RenderingCore  
      VTK::RenderingOpenGL2  
      VTK::RenderingVolumeOpenGL2  
