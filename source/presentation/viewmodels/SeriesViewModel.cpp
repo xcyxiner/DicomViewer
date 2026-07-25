@@ -1,6 +1,6 @@
 
 #include "SeriesViewModel.h"
-#include "infrastructure/rendering/VtkRenderer.h"
+#include "infrastructure/rendering/VtkAdaptRenderer.h"
 #include "infrastructure/dicom_io/HybridReader.h"
 #include "infrastructure/dicom_io/VTKDicomAdaptReader.h"
 #include "infrastructure/task/QtTaskQueue.h"
@@ -8,7 +8,7 @@
 SeriesViewModel::SeriesViewModel(QObject* parent)
     : QObject(parent)
 {
-  m_imageRenderer = std::make_shared<VtkRenderer>();
+  m_imageRenderer = std::make_shared<VtkAdaptRenderer>();
   m_stackDisplaySet = std::make_shared<StackDisplaySet>();
   m_dicomReader = std::make_unique<VTKDicomAdaptReader>();
   m_taskQueue = std::make_unique<QtTaskQueue>();

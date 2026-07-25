@@ -1,4 +1,4 @@
-#include "VtkRenderer.h"
+#include "VtkAdaptRenderer.h"
 #include <vtkActor.h>
 #include <vtkConeSource.h>
 #include <vtkImageActor.h>
@@ -6,7 +6,7 @@
 #include <vtkImageMapToWindowLevelColors.h>
 #include <vtkMatrix3x3.h>
 #include <vtkPolyDataMapper.h>
-VtkRenderer::VtkRenderer()
+VtkAdaptRenderer::VtkAdaptRenderer()
 {
   m_imageActor = vtkSmartPointer<vtkImageActor>::New();
   m_renderer = vtkSmartPointer<vtkRenderer>::New();
@@ -16,13 +16,13 @@ VtkRenderer::VtkRenderer()
   m_imageActor->SetProperty(imageProperty);
   m_windowLevelColors = vtkSmartPointer<vtkImageMapToWindowLevelColors>::New();
 }
-void VtkRenderer::setRenderTarget(vtkSmartPointer<vtkRenderWindow> window)
+void VtkAdaptRenderer::setRenderTarget(vtkSmartPointer<vtkRenderWindow> window)
 {
   m_renderWindow = window;
   m_renderWindow->AddRenderer(m_renderer);
 }
-void VtkRenderer::render(const IFrameCache::FramePtr& frame,
-                         const DisplaySettings& settings)
+void VtkAdaptRenderer::render(const IFrameCache::FramePtr& frame,
+                              const DisplaySettings& settings)
 {
   std::visit(
       [this, &settings](auto&& arg)
@@ -55,8 +55,8 @@ void VtkRenderer::render(const IFrameCache::FramePtr& frame,
       },
       frame);
 }
-void VtkRenderer::reset() {}
-void VtkRenderer::CompareImageData(vtkImageData* img1, vtkImageData* img2)
+void VtkAdaptRenderer::reset() {}
+void VtkAdaptRenderer::CompareImageData(vtkImageData* img1, vtkImageData* img2)
 {
   // 检查维度和数据类型
   int dims1[3], dims2[3];
@@ -115,7 +115,7 @@ void VtkRenderer::CompareImageData(vtkImageData* img1, vtkImageData* img2)
               << std::endl;
   }
 }
-vtkSmartPointer<vtkImageData> VtkRenderer::convertFrameToImageData(
+vtkSmartPointer<vtkImageData> VtkAdaptRenderer::convertFrameToImageData(
     const std::shared_ptr<Frame>& frame)
 {
   auto imageData = vtkSmartPointer<vtkImageData>::New();

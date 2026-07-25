@@ -8,7 +8,7 @@ $ProjectRoot = "$HomeDir\xcyxiner\DicomViewer"
 
 $DicomDebugPath   = "$ProjectRoot\vcpkg_installed\x64-windows\debug"
 $DicomReleasePath = "$ProjectRoot\vcpkg_installed\x64-windows"
-
+$env:DCMDICTPATH = "$ProjectRoot\vcpkg_installed\x64-windows\share\dcmtk\dicom.dic"
 & $VcpkgCMake -S . -B build `
     -D CMAKE_BUILD_TYPE=Debug `
     -D CMAKE_TOOLCHAIN_FILE="$VcpkgRoot\scripts\buildsystems\vcpkg.cmake" `

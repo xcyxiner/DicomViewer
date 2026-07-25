@@ -3,18 +3,18 @@
 #include "IImageRenderer.h"
 #include "vtkSmartPointer.h"
 #include "vtkImageActor.h"
-#include "vtkRenderer.h"
+#include <vtkRenderer.h>
 #include "vtkRenderWindow.h"
 #include "vtkImageProperty.h"
 #include "vtkImageMapToWindowLevelColors.h"
 #include "vtkInteractorStyleImage.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkImageMapper3D.h"
-class VtkRenderer : public IImageRenderer
+class VtkAdaptRenderer : public IImageRenderer
 {
 public:
-  explicit VtkRenderer();
-  ~VtkRenderer() = default;
+  explicit VtkAdaptRenderer();
+  ~VtkAdaptRenderer() = default;
 
 public:
   void setRenderTarget(vtkSmartPointer<vtkRenderWindow> window) override;  // 设置渲染目标
