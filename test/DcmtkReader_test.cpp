@@ -3,7 +3,7 @@
 #include "infrastructure/dicom_io/GdcmReader.h"  // 根据你的实际路径调整
 #include "infrastructure/dicom_io/HybridReader.h"  // 根据你的实际路径调整
 #include "infrastructure/dicom_io/VTKDicomAdaptReader.h"  // 根据你的实际路径调整
-#include "infrastructure/rendering/VtkRenderer.h"  // 根据你的实际路径调整
+#include "infrastructure/rendering/VtkAdaptRenderer.h"  // 根据你的实际路径调整
 #include "infrastructure/cache/MemoryFrameCache.h"  // 根据你的实际路径调整
 
 #include <vtkSmartPointer.h>
@@ -61,8 +61,8 @@ TEST(HybridReaderTest, readFrame) {
         }
     }, frame);
 }
-TEST(VtkRendererTest,convertFrameToImageData) {
-    VtkRenderer renderer;
+TEST(VtkAdaptRendererTest,convertFrameToImageData) {
+    VtkAdaptRenderer renderer;
     HybridReader reader;
     reader.open(single_dicom);
     auto frame = reader.readFrame(0);
@@ -78,8 +78,8 @@ TEST(VtkRendererTest,convertFrameToImageData) {
         }
     }, frame);
 }
-TEST(VtkRendererTest,CompareImageData) {
-    VtkRenderer renderer;
+TEST(VtkAdaptRendererTest,CompareImageData) {
+    VtkAdaptRenderer renderer;
     HybridReader reader;
     VTKDicomAdaptReader vtkReader;
     reader.open(single_dicom);
