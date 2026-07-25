@@ -7,7 +7,9 @@
 #include "qmenubar.h"
 #include "qtmetamacros.h"
 #include "qwidget.h"
-
+namespace Ui {
+    class FileMenu;
+} 
 class FileMenu : public QMenu
 {
   Q_OBJECT
@@ -18,7 +20,6 @@ signals:
   void openFile();
 
 private:
-  void initView(QMenuBar* menuBar);
   void createConnections(QWidget* parent) const;
-  QAction* m_fileOpenAction;
+  Ui::FileMenu* ui;
 };
