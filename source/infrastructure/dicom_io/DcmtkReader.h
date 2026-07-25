@@ -9,10 +9,11 @@ class DcmtkReader : public IDicomReader
 public:
     explicit DcmtkReader();
     ~DcmtkReader()=default;
-
-    void open(const std::string& path) override;
-    Series readSeries() override;
-    std::shared_ptr<Frame> readFrame(int index) override;
+    virtual void open(const std::string& filePath) override;
+    virtual Series readSeries(const std::string& path) override;
+    virtual std::unique_ptr<Frame> readFrameInfo(int frameIndex) override;
+    virtual IFrameCache::FramePtr readFrame(int frameIndex) override;
+    virtual void close() override;   
 private:
     // 这里可以添加Dcmtk相关的成员变量，例如DcmFileFormat对象等
    std::unique_ptr<DcmFileFormat> m_fileFormat; // 示例成员变量，实际根据Dcmtk的使用情况调整

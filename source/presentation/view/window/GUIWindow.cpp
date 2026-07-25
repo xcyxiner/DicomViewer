@@ -21,7 +21,7 @@ GUIWindow::GUIWindow(QWidget* parent)
 {
   ui->setupUi(this);
   createMenu();
-  initvtkTest();
+  // initvtkTest();
 }
 void GUIWindow::initvtkTest(){
   // 1. 创建Qt控件
@@ -41,15 +41,16 @@ void GUIWindow::showEvent(QShowEvent* event) {
   static bool firstShow = true;
   if (firstShow) {
     firstShow = false;
-  // 5. 可以添加一些测试数据看看效果（比如立方体）
-  auto source = vtkSmartPointer<vtkConeSource>::New();
-  auto mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-  mapper->SetInputConnection(source->GetOutputPort());
-  auto actor = vtkSmartPointer<vtkActor>::New();
-  actor->SetMapper(mapper);
-  renderer->AddActor(actor);
-  renderer->ResetCamera();
- renderer->GetRenderWindow()->Render();
+    // // 5. 可以添加一些测试数据看看效果（比如立方体）
+    // auto source = vtkSmartPointer<vtkConeSource>::New();
+    // auto mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+    // mapper->SetInputConnection(source->GetOutputPort());
+    // auto actor = vtkSmartPointer<vtkActor>::New();
+    // actor->SetMapper(mapper);
+    // renderer->AddActor(actor);
+    // renderer->ResetCamera();
+    // renderer->GetRenderWindow()->Render();
+     dynamic_cast<GUICenter*>(m_childWidget)->showEvent();
   }
 }
 
@@ -57,8 +58,8 @@ GUIWindow::~GUIWindow() = default;
 
 void GUIWindow::setContent(QWidget* t_widget)
 {
-  // this->m_childWidget = t_widget;
-  // this->ui->centralwidget = t_widget;
+  ui->layout->addWidget(t_widget);
+  m_childWidget = t_widget;
 }
 
 void GUIWindow::createMenu()

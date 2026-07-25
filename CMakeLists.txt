@@ -17,7 +17,19 @@ include(cmake/variables.cmake)
 
 # ---- Declare executable ----
 find_package(Qt6 REQUIRED COMPONENTS Widgets OpenGLWidgets)
-
+if(DEFINED ENV{DCMDICTPATH})
+    set(DCM_DICT_PATH "$ENV{DCMDICTPATH}")
+    message(STATUS "Using DCMDICTPATH: ${DCM_DICT_PATH}")
+else()
+    # 可选：如果环境变量未设置，尝试查找默认路径（避免硬编码）
+    find_file(DCM_DICT_PATH
+        NAMES dicom.dic
+        PATHS /usr/share/dcmtk /usr/local/share/dcmtk /opt/dcmtk/share/dcmtk
+    )
+    if(NOT DCM_DICT_PATH)
+        message(FATAL_ERROR "DCMDICTPATH not set and dicom.dic not found in standard paths.")
+    endif()
+endif()
 find_package(DCMTK REQUIRED)
 find_package(VTK REQUIRED COMPONENTS  
   GUISupportQt  
@@ -36,7 +48,7 @@ find_package(VTK REQUIRED COMPONENTS
   RenderingQt 
 )
 find_package(dicom CONFIG REQUIRED)
-
+find_package(GDCM CONFIG REQUIRED)
 qt_standard_project_setup()
 
 execute_process(
@@ -64,10 +76,12 @@ target_include_directories(DicomViewer_exe PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/s
 target_compile_features(DicomViewer_exe PRIVATE cxx_std_17)
 
 target_link_libraries(dicom_core  
-   PRIVATE  
+   PUBLIC  
      Qt6::Widgets
      Qt6::OpenGLWidgets
-     DCMTK::DCMTK  
+     DCMTK::dcmdata
+     DCMTK::ofstd
+     DCMTK::dcmfg
      VTK::GUISupportQt  
      VTK::CommonCore  
      VTK::CommonDataModel
@@ -82,13 +96,20 @@ target_link_libraries(dicom_core
      VTK::InteractionStyle  
      VTK::RenderingQt
      VTK::DICOM
+     gdcmDICT
+     gdcmIOD
+     gdcmDSED
+     gdcmCommon
+     gdcmMSFF
 )
 
 target_link_libraries(DicomViewer_exe  
    PRIVATE  
      Qt6::Widgets
      Qt6::OpenGLWidgets
-     DCMTK::DCMTK  
+     DCMTK::dcmdata
+     DCMTK::ofstd
+     DCMTK::dcmfg  
      VTK::GUISupportQt  
      VTK::CommonCore  
      VTK::CommonDataModel
@@ -103,8 +124,20 @@ target_link_libraries(DicomViewer_exe
      VTK::InteractionStyle  
      VTK::RenderingQt
      VTK::DICOM
+     gdcmDICT
+     gdcmIOD
+     gdcmDSED
+     gdcmCommon
+     gdcmMSFF
 )
-
+# 为需要 DCMTK 的目标添加宏定义
+target_compile_definitions(dicom_core PUBLIC
+    DCM_DICT_DEFAULT_PATH="${DCM_DICT_PATH}"
+)
+# 如果还有其他目标（如 DicomViewer_exe）也编译该文件，同样添加
+target_compile_definitions(DicomViewer_exe PRIVATE
+    DCM_DICT_DEFAULT_PATH="${DCM_DICT_PATH}"
+)
 # ---------- Windows: 自动 windeployqt ----------
 option(DEPLOY_QT_PLUGINS "Auto-copy Qt platform plugins after build" OFF)
 if(WIN32 AND MSVC AND DEPLOY_QT_PLUGINS)

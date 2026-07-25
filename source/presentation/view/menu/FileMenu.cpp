@@ -7,29 +7,19 @@
 #include "qkeysequence.h"
 #include "qmenu.h"
 #include "presentation/view/window/GUIWindow.h"
-
+#include "ui_FileMenu.h"
 FileMenu::FileMenu(QMenuBar* menuBar, QWidget* parent)
-    : QMenu(parent)
+    : QMenu(parent),ui(new Ui::FileMenu)
 {
-  initView(menuBar);
+  ui->setupUi(menuBar);
   createConnections(parent);
 }
 
-void FileMenu::initView(QMenuBar* menuBar)
-{
-  auto* menu = new QMenu("File", this);
 
-  this->m_fileOpenAction = new QAction("Open", this);
-
-  this->m_fileOpenAction->setShortcut(QKeySequence::Open);
-
-  menu->addAction(m_fileOpenAction);
-  menuBar->addMenu(menu);
-}
 
 void FileMenu::createConnections(QWidget* parent) const
 {
   auto* receiver = dynamic_cast<GUIWindow*>(parent);
   connect(
-      m_fileOpenAction, &QAction::triggered, receiver, &GUIWindow::openFile);
+      ui->actionOpen, &QAction::triggered, receiver, &GUIWindow::openFile);
 }
