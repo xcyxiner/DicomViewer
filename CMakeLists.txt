@@ -17,19 +17,7 @@ include(cmake/variables.cmake)
 
 # ---- Declare executable ----
 find_package(Qt6 REQUIRED COMPONENTS Widgets OpenGLWidgets)
-if(DEFINED ENV{DCMDICTPATH})
-    set(DCM_DICT_PATH "$ENV{DCMDICTPATH}")
-    message(STATUS "Using DCMDICTPATH: ${DCM_DICT_PATH}")
-else()
-    # 可选：如果环境变量未设置，尝试查找默认路径（避免硬编码）
-    find_file(DCM_DICT_PATH
-        NAMES dicom.dic
-        PATHS /usr/share/dcmtk /usr/local/share/dcmtk /opt/dcmtk/share/dcmtk
-    )
-    if(NOT DCM_DICT_PATH)
-        message(FATAL_ERROR "DCMDICTPATH not set and dicom.dic not found in standard paths.")
-    endif()
-endif()
+
 find_package(DCMTK REQUIRED)
 find_package(VTK REQUIRED COMPONENTS  
   GUISupportQt  
@@ -57,15 +45,16 @@ execute_process(
 )  
 include(source_list.cmake)
 
-add_library(dicom_core STATIC
-    ${SRC}
-)
+option(AUTO_TESTING "Enable automatic testing" OFF)
+if(AUTO_TESTING)
+    add_library(dicom_core STATIC
+        ${SRC}
+    )
 
-target_include_directories(dicom_core PUBLIC
-    ${CMAKE_SOURCE_DIR}/source
-)
-
-
+    target_include_directories(dicom_core PUBLIC
+        ${CMAKE_SOURCE_DIR}/source
+    )
+endif()
 
 add_executable(DicomViewer_exe ${SRC})
 add_executable(DicomViewer::exe ALIAS DicomViewer_exe)
@@ -75,34 +64,35 @@ target_include_directories(DicomViewer_exe PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/s
 
 target_compile_features(DicomViewer_exe PRIVATE cxx_std_17)
 
-target_link_libraries(dicom_core  
-   PUBLIC  
-     Qt6::Widgets
-     Qt6::OpenGLWidgets
-     DCMTK::dcmdata
-     DCMTK::ofstd
-     DCMTK::dcmfg
-     VTK::GUISupportQt  
-     VTK::CommonCore  
-     VTK::CommonDataModel
-     VTK::FiltersCore  
-     VTK::IOImage  
-     VTK::ImagingColor
-     VTK::ImagingCore
-     VTK::ImagingGeneral
-     VTK::RenderingCore  
-     VTK::RenderingOpenGL2  
-     VTK::RenderingVolumeOpenGL2  
-     VTK::InteractionStyle  
-     VTK::RenderingQt
-     VTK::DICOM
-     gdcmDICT
-     gdcmIOD
-     gdcmDSED
-     gdcmCommon
-     gdcmMSFF
-)
-
+if(AUTO_TESTING)
+    target_link_libraries(dicom_core  
+    PUBLIC  
+        Qt6::Widgets
+        Qt6::OpenGLWidgets
+        DCMTK::dcmdata
+        DCMTK::ofstd
+        DCMTK::dcmfg
+        VTK::GUISupportQt  
+        VTK::CommonCore  
+        VTK::CommonDataModel
+        VTK::FiltersCore  
+        VTK::IOImage  
+        VTK::ImagingColor
+        VTK::ImagingCore
+        VTK::ImagingGeneral
+        VTK::RenderingCore  
+        VTK::RenderingOpenGL2  
+        VTK::RenderingVolumeOpenGL2  
+        VTK::InteractionStyle  
+        VTK::RenderingQt
+        VTK::DICOM
+        gdcmDICT
+        gdcmIOD
+        gdcmDSED
+        gdcmCommon
+        gdcmMSFF
+    )
+endif()
 target_link_libraries(DicomViewer_exe  
    PRIVATE  
      Qt6::Widgets
@@ -130,14 +120,42 @@ target_link_libraries(DicomViewer_exe
      gdcmCommon
      gdcmMSFF
 )
-# 为需要 DCMTK 的目标添加宏定义
-target_compile_definitions(dicom_core PUBLIC
-    DCM_DICT_DEFAULT_PATH="${DCM_DICT_PATH}"
-)
-# 如果还有其他目标（如 DicomViewer_exe）也编译该文件，同样添加
-target_compile_definitions(DicomViewer_exe PRIVATE
-    DCM_DICT_DEFAULT_PATH="${DCM_DICT_PATH}"
-)
+if(UNIX)
+        if(DEFINED ENV{DCMDICTPATH})
+        set(DCM_DICT_PATH "$ENV{DCMDICTPATH}")
+        message(STATUS "Using DCMDICTPATH: ${DCM_DICT_PATH}")
+    else()
+        # 2. 在项目源码树中查找 dicom.dic（递归搜索）
+        file(GLOB_RECURSE DCM_DICT_CANDIDATES 
+            ${CMAKE_SOURCE_DIR}/dicom.dic
+            ${CMAKE_SOURCE_DIR}/*/dicom.dic   # 可放宽，但 GLOB_RECURSE 本身会递归
+        )
+        # 但 GLOB_RECURSE 返回列表，取第一个
+        list(GET DCM_DICT_CANDIDATES 0 DCM_DICT_PATH)
+        if(DCM_DICT_PATH)
+            message(STATUS "Found dicom.dic in source tree: ${DCM_DICT_PATH}")
+        else()
+            # 可选：如果环境变量未设置，尝试查找默认路径（避免硬编码）
+            find_file(DCM_DICT_PATH
+                NAMES dicom.dic
+                PATHS /usr/share/dcmtk /usr/local/share/dcmtk /opt/dcmtk/share/dcmtk
+            )
+            if(NOT DCM_DICT_PATH)
+                message(FATAL_ERROR "DCMDICTPATH not set and dicom.dic not found in standard paths.")
+            endif()
+        endif()
+    endif()
+    if(AUTO_TESTING)
+        # 为需要 DCMTK 的目标添加宏定义
+        target_compile_definitions(dicom_core PUBLIC
+            DCM_DICT_DEFAULT_PATH="${DCM_DICT_PATH}"
+        )
+    endif()
+    # 如果还有其他目标（如 DicomViewer_exe）也编译该文件，同样添加
+    target_compile_definitions(DicomViewer_exe PRIVATE
+        DCM_DICT_DEFAULT_PATH="${DCM_DICT_PATH}"
+    )
+endif()
 # ---------- Windows: 自动 windeployqt ----------
 option(DEPLOY_QT_PLUGINS "Auto-copy Qt platform plugins after build" OFF)
 if(WIN32 AND MSVC AND DEPLOY_QT_PLUGINS)
@@ -189,7 +207,6 @@ if(NOT CMAKE_SKIP_INSTALL_RULES)
 endif()
 
 # ---- Developer mode ----
-option(AUTO_TESTING "Enable automatic testing" OFF)
 if(AUTO_TESTING)
     enable_testing()
     add_subdirectory(test)

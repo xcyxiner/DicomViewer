@@ -92,7 +92,7 @@ void VtkAdaptRenderer::CompareImageData(vtkImageData* img1, vtkImageData* img2)
     unsigned short v1 = ptr1[i];
     unsigned short v2 = ptr2[i];
     double diff = std::abs(static_cast<double>(v1) - static_cast<double>(v2));
-    if (diff != 0.0) {
+    if (diff >= 0.0) {
       sumDiff += diff;
       if (diff > maxDiff) {
         maxDiff = diff;

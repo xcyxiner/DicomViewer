@@ -34,13 +34,15 @@ jobs:
     needs: [lint]
 
     runs-on: ubuntu-24.04
-
+    container:
+      image: ghcr.io/xcyxiner/dicomviewer-ci:latest
     # To enable coverage, delete the last line from the conditional below and
     # edit the "<name>" placeholder to your GitHub name.
     # If you do not wish to use codecov, then simply delete this job from the
     # workflow.
-    if: github.repository_owner == '<name>'
-      && false
+    if: github.repository_owner == 'xcyxiner'
+    env:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
     steps:
     - uses: actions/checkout@v4
@@ -63,6 +65,7 @@ jobs:
       run: cmake --build build/coverage -t coverage
 
     - name: Submit to codecov.io
+      if: env.CODECOV_TOKEN != ''
       uses: codecov/codecov-action@v4
       with:
         file: build/coverage/coverage.info
