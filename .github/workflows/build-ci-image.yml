@@ -1,0 +1,19 @@
+# .github/workflows/build-ci-image.yml
+name: Build CI Image
+on:
+  workflow_dispatch:  # 手动触发一次就行
+
+permissions:
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile  # 你现有的 Dockerfile
+          push: true
+          tags: ghcr.io/xcyxiner/dicomviewer-ci:latest
