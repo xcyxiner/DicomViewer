@@ -1,4 +1,5 @@
 #include "VtkAdaptRenderer.h"
+
 #include <vtkActor.h>
 #include <vtkConeSource.h>
 #include <vtkImageActor.h>
@@ -6,6 +7,7 @@
 #include <vtkImageMapToWindowLevelColors.h>
 #include <vtkMatrix3x3.h>
 #include <vtkPolyDataMapper.h>
+
 VtkAdaptRenderer::VtkAdaptRenderer()
 {
   m_imageActor = vtkSmartPointer<vtkImageActor>::New();
@@ -16,11 +18,13 @@ VtkAdaptRenderer::VtkAdaptRenderer()
   m_imageActor->SetProperty(imageProperty);
   m_windowLevelColors = vtkSmartPointer<vtkImageMapToWindowLevelColors>::New();
 }
+
 void VtkAdaptRenderer::setRenderTarget(vtkSmartPointer<vtkRenderWindow> window)
 {
   m_renderWindow = window;
   m_renderWindow->AddRenderer(m_renderer);
 }
+
 void VtkAdaptRenderer::render(const IFrameCache::FramePtr& frame,
                               const DisplaySettings& settings)
 {
@@ -55,7 +59,9 @@ void VtkAdaptRenderer::render(const IFrameCache::FramePtr& frame,
       },
       frame);
 }
+
 void VtkAdaptRenderer::reset() {}
+
 void VtkAdaptRenderer::CompareImageData(vtkImageData* img1, vtkImageData* img2)
 {
   // 检查维度和数据类型
@@ -108,13 +114,14 @@ void VtkAdaptRenderer::CompareImageData(vtkImageData* img1, vtkImageData* img2)
   if (firstDiffIdx != -1) {
     std::cout << "First diff at linear index " << firstDiffIdx << " (row "
               << firstDiffIdx / dims1[0] << ", col " << firstDiffIdx % dims1[0]
-              << ")"
-              << ": img1=" << firstVal1 << ", img2=" << firstVal2 << std::endl;
+              << ")" << ": img1=" << firstVal1 << ", img2=" << firstVal2
+              << std::endl;
   } else {
     std::cout << "All pixels are identical (within numeric precision)."
               << std::endl;
   }
 }
+
 vtkSmartPointer<vtkImageData> VtkAdaptRenderer::convertFrameToImageData(
     const std::shared_ptr<Frame>& frame)
 {

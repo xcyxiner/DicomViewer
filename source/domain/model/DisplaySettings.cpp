@@ -1,23 +1,25 @@
 
 #include "DisplaySettings.h"
 
-DisplaySettings::DisplaySettings()
-{
-}
+DisplaySettings::DisplaySettings() {}
 
 // --- DisplaySettings Getters & Setters (auto-generated) ---
-double DisplaySettings::getWindowWidth() const {
+double DisplaySettings::getWindowWidth() const
+{
   return windowWidth;
 }
 
-void DisplaySettings::setWindowWidth(double windowWidth) {
+void DisplaySettings::setWindowWidth(double windowWidth)
+{
   this->windowWidth = windowWidth;
 }
 
-double DisplaySettings::getWindowCenter() const {
+double DisplaySettings::getWindowCenter() const
+{
   return windowCenter;
 }
 
-void DisplaySettings::setWindowCenter(double windowCenter) {
+void DisplaySettings::setWindowCenter(double windowCenter)
+{
   this->windowCenter = windowCenter;
 }

@@ -12,7 +12,8 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-24.04
-
+    container:
+      image: ghcr.io/xcyxiner/dicomviewer-ci:latest
     steps:
     - uses: actions/checkout@v4
 

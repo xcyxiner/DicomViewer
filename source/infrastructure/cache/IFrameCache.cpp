@@ -1,6 +1,4 @@
 
 #include "IFrameCache.h"
 
-IFrameCache::IFrameCache()
-{
-}
+IFrameCache::IFrameCache() {}

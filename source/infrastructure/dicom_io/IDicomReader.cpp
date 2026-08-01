@@ -1,6 +1,4 @@
 
 #include "IDicomReader.h"
 
-IDicomReader::IDicomReader()
-{
-}
+IDicomReader::IDicomReader() {}

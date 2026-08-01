@@ -1,6 +1,4 @@
 
 #include "ITaskQueue.h"
 
-ITaskQueue::ITaskQueue()
-{
-}
+ITaskQueue::ITaskQueue() {}
