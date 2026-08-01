@@ -1,0 +1,1 @@
+docker build --progress=plain -t ghcr.io/xcyxiner/dicomviewer-ci:latest . 2>&1 | tee build.log
