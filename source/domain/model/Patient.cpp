@@ -20,10 +20,10 @@ Study* Patient::addStudy(std::unique_ptr<Study> t_study)
 
 std::size_t Patient::findStudyIndex(Study* t_study)
 {
-  const auto it =
-      std::find_if(m_studies.begin(),
-                   m_studies.end(),
-                   [&t_study](const std::unique_ptr<Study>& study)
-                   { return t_study->getUID() == study->getUID(); });
+  const auto it = std::find_if(m_studies.begin(),
+                               m_studies.end(),
+                               [&t_study](const std::unique_ptr<Study>& study) {
+                                 return t_study->getUID() == study->getUID();
+                               });
   return std::distance(m_studies.begin(), it);
 }

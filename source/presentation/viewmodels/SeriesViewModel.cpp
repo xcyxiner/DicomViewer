@@ -1,10 +1,12 @@
 
 #include "SeriesViewModel.h"
-#include "infrastructure/rendering/VtkAdaptRenderer.h"
+
+#include "infrastructure/cache/MemoryFrameCache.h"
 #include "infrastructure/dicom_io/HybridReader.h"
 #include "infrastructure/dicom_io/VTKDicomAdaptReader.h"
+#include "infrastructure/rendering/VtkAdaptRenderer.h"
 #include "infrastructure/task/QtTaskQueue.h"
-#include "infrastructure/cache/MemoryFrameCache.h"
+
 SeriesViewModel::SeriesViewModel(QObject* parent)
     : QObject(parent)
 {
@@ -16,10 +18,12 @@ SeriesViewModel::SeriesViewModel(QObject* parent)
   m_loadSeriesUseCase = std::make_unique<LoadSeriesUseCase>(
       *m_dicomReader, *m_taskQueue, *m_frameCache);
 }
+
 void SeriesViewModel::setRenderWindow(vtkSmartPointer<vtkRenderWindow> window)
 {
   m_imageRenderer->setRenderTarget(window);
 }
+
 void SeriesViewModel::render()
 {
   std::string sopUid = m_stackDisplaySet->getFrameUids().at(
@@ -32,6 +36,7 @@ void SeriesViewModel::render()
   }
   m_imageRenderer->render(frame, m_stackDisplaySet->getDisplaySettings());
 }
+
 void SeriesViewModel::loadSeries(const std::string& path)
 {
   auto future = m_loadSeriesUseCase->loadSeriesAsync(path);

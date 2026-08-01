@@ -1,9 +1,11 @@
 
 
 #include "LoadSeriesUseCase.h"
+
 #include <vtkFieldData.h>
 #include <vtkImageData.h>
 #include <vtkStringArray.h>
+
 LoadSeriesUseCase::LoadSeriesUseCase(IDicomReader& dicomReader,
                                      ITaskQueue& taskQueue,
                                      IFrameCache& frameCache)
@@ -12,6 +14,7 @@ LoadSeriesUseCase::LoadSeriesUseCase(IDicomReader& dicomReader,
     , m_frameCache(frameCache)
 {
 }
+
 std::future<std::shared_ptr<StackDisplaySet>>
 LoadSeriesUseCase::loadSeriesAsync(const std::string& path)
 {

@@ -1,10 +1,13 @@
 #include "DcmtkReader.h"
+
 #include <dcmtk/dcmdata/dcdeftag.h>
 #include <dcmtk/dcmdata/dcvrat.h>
 #include <dcmtk/dcmfg/fgbase.h>
 #include <dcmtk/dcmfg/fginterface.h>
 #include <dcmtk/dcmfg/fgtypes.h>
+
 DcmtkReader::DcmtkReader() {}
+
 void DcmtkReader::open(const std::string& path)
 {
   m_fileFormat = std::make_unique<DcmFileFormat>();
@@ -15,10 +18,12 @@ void DcmtkReader::open(const std::string& path)
     m_dataset = std::make_unique<DcmDataset>(*m_fileFormat->getDataset());
   }
 }
+
 Series DcmtkReader::readSeries(const std::string& path)
 {
   return Series();
 }
+
 template<size_t N>
 bool getTagAsArray(const std::unique_ptr<DcmDataset>& dataset,
                    const DcmTagKey& tag,
@@ -30,14 +35,16 @@ bool getTagAsArray(const std::unique_ptr<DcmDataset>& dataset,
     if (!status.good()) {
       allGood = false;
       // 可以选择break或继续
-      throw std::runtime_error("Failed to read DICOM tag: " + std::string(status.text()));
+      throw std::runtime_error("Failed to read DICOM tag: "
+                               + std::string(status.text()));
     }
   }
   return allGood;
 }
+
 std::unique_ptr<Frame> DcmtkReader::readFrameInfo(int index)
 {
-  auto frame =std::make_unique<Frame>();
+  auto frame = std::make_unique<Frame>();
   OFString sopInstanceUid;
   m_dataset->findAndGetOFString(DCM_SOPInstanceUID, sopInstanceUid);
   frame->setSopInstanceUid(std::string(sopInstanceUid.c_str()));
@@ -48,10 +55,11 @@ std::unique_ptr<Frame> DcmtkReader::readFrameInfo(int index)
   {
     numberOfFrames = std::atoi(numberOfFramesStr.c_str());
   }
-  //更新索引
+  // 更新索引
   frame->setFrameIndex(index);
   bool isSingleFrame = (numberOfFrames == 1);
-  bool isEnhancedMultiFrame = false;  // 这里可以添加逻辑来判断是否为增强型多帧DICOM
+  bool isEnhancedMultiFrame =
+      false;  // 这里可以添加逻辑来判断是否为增强型多帧DICOM
   bool isOldMultiFrame = false;  // 这里可以添加逻辑来判断是否为旧式多帧DICOM
   if (!isSingleFrame) {
     FGInterface fgInterface;
@@ -63,7 +71,7 @@ std::unique_ptr<Frame> DcmtkReader::readFrameInfo(int index)
       }
     }
   }
-  //先处理单帧
+  // 先处理单帧
   if (isSingleFrame) {
     // 像素间距 先行 后列
     std::array<double, 2> pixelSpacing = {0.0, 0.0};
@@ -84,19 +92,21 @@ std::unique_ptr<Frame> DcmtkReader::readFrameInfo(int index)
     // 斜率和截距
     double slope = 1.0;
     double intercept = 0.0;
-    OFCondition status =  m_dataset->findAndGetFloat64(DCM_RescaleSlope, slope, 0);
-    if(!status.good()) {
-      slope = 1.0; // 默认值
+    OFCondition status =
+        m_dataset->findAndGetFloat64(DCM_RescaleSlope, slope, 0);
+    if (!status.good()) {
+      slope = 1.0;  // 默认值
     }
-    status =  m_dataset->findAndGetFloat64(DCM_RescaleIntercept, intercept, 0);
-    if(!status.good()) {
-      intercept = 0.0; // 默认值
+    status = m_dataset->findAndGetFloat64(DCM_RescaleIntercept, intercept, 0);
+    if (!status.good()) {
+      intercept = 0.0;  // 默认值
     }
     frame->setSlope(slope);
     frame->setIntercept(intercept);
   }
   return frame;
 }
+
 IFrameCache::FramePtr DcmtkReader::readFrame(int index)
 {
   return IFrameCache::FramePtr();

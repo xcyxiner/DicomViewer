@@ -1,6 +1,4 @@
 
 #include "IImageRenderer.h"
 
-IImageRenderer::IImageRenderer()
-{
-}
+IImageRenderer::IImageRenderer() {}
