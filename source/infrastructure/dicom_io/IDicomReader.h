@@ -9,7 +9,7 @@ class IDicomReader
 {
 public:
     explicit IDicomReader();
-    ~IDicomReader()=default;
+    virtual ~IDicomReader()=default;
     virtual void open(const std::string& filePath) = 0;
     virtual Series readSeries(const std::string& path) = 0;
 	virtual std::unique_ptr<Frame> readFrameInfo( int index) = 0;

@@ -75,8 +75,8 @@ jobs:
     needs: [lint]
 
     runs-on: ubuntu-24.04
-
-    env: { CXX: clang++-18 }
+    container:
+      image: ghcr.io/xcyxiner/dicomviewer-ci:latest
 
     steps:
     - uses: actions/checkout@v4
