@@ -159,16 +159,27 @@ endif()
 # ---------- Windows: 自动 windeployqt ----------
 option(DEPLOY_QT_PLUGINS "Auto-copy Qt platform plugins after build" OFF)
 if(WIN32 AND MSVC AND DEPLOY_QT_PLUGINS)
-    set(_qt_debug_bin "${CMAKE_BINARY_DIR}/vcpkg_installed/x64-windows/debug/bin")
-    set(_qt_debug_plugins "${CMAKE_BINARY_DIR}/vcpkg_installed/x64-windows/debug/Qt6/plugins")
+    # Debug 配置
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+        set(_qt_bin "${CMAKE_BINARY_DIR}/vcpkg_installed/x64-windows/debug/bin")
+        set(_qt_plugins "${CMAKE_BINARY_DIR}/vcpkg_installed/x64-windows/debug/Qt6/plugins")
+        set(_plugin_suffix "d")
+        set(_config_name "Debug")
+    else()
+        # Release 配置
+        set(_qt_bin "${CMAKE_BINARY_DIR}/vcpkg_installed/x64-windows/bin")
+        set(_qt_plugins "${CMAKE_BINARY_DIR}/vcpkg_installed/x64-windows/Qt6/plugins")
+        set(_plugin_suffix "")
+        set(_config_name "Release")
+    endif()
 
     add_custom_command(TARGET DicomViewer_exe POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory
             $<TARGET_FILE_DIR:DicomViewer_exe>/platforms
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${_qt_debug_plugins}/platforms/qwindowsd.dll"
-            $<TARGET_FILE_DIR:DicomViewer_exe>/platforms/qwindowsd.dll
-        COMMENT "Copying qwindowsd.dll (Debug)"
+            "${_qt_plugins}/platforms/qwindows${_plugin_suffix}.dll"
+            $<TARGET_FILE_DIR:DicomViewer_exe>/platforms/qwindows${_plugin_suffix}.dll
+        COMMENT "Copying qwindows${_plugin_suffix}.dll (${_config_name})"
     )
 endif()
 
@@ -177,22 +188,41 @@ endif()
 # ============================================================
 option(AUTO_DEPLOY_FONTS "Auto copy system fonts for Qt (Linux/Debug only)" OFF)
 if(AUTO_DEPLOY_FONTS AND UNIX)
-    # Qt 会找这个路径
-    set(QT_FONT_DEST "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-linux/debug/lib/fonts")
+    # 根据构建类型选择不同的目标路径
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+        set(QT_FONT_DEST "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-linux/debug/lib/fonts")
+    else()
+        set(QT_FONT_DEST "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-linux/lib/fonts")
+    endif()
+    
     if(NOT EXISTS "${QT_FONT_DEST}")
         file(MAKE_DIRECTORY "${QT_FONT_DEST}")
-        # 系统字体来源（Ubuntu 默认路径）
-        set(SYSTEM_FONT_DIR "/usr/share/fonts/truetype/dejavu")
-        if(EXISTS "${SYSTEM_FONT_DIR}")
-            file(GLOB DEJAVU_FONTS "${SYSTEM_FONT_DIR}/*.ttf")
-            foreach(FONT ${DEJAVU_FONTS})
-                file(COPY "${FONT}" DESTINATION "${QT_FONT_DEST}")
-                message(STATUS "  Deployed font: ${FONT}")
-            endforeach()
-            message(STATUS "✅ Deployed DejaVu fonts to ${QT_FONT_DEST}")
-        else()
-            message(WARNING "⚠️ DejaVu fonts not found at ${SYSTEM_FONT_DIR}")
-            message(WARNING "  Install with: sudo apt install fonts-dejavu-core")
+        
+        # 尝试多个可能的字体目录
+        set(FONT_DIRS 
+            "/usr/share/fonts/truetype/dejavu"
+            "/usr/share/fonts/truetype/liberation"
+            "/usr/share/fonts/truetype/ubuntu"
+            "/usr/share/fonts/truetype/freefont"
+        )
+        
+        set(FONT_COPIED FALSE)
+        foreach(FONT_DIR ${FONT_DIRS})
+            if(EXISTS "${FONT_DIR}")
+                file(GLOB FONTS "${FONT_DIR}/*.ttf")
+                foreach(FONT ${FONTS})
+                    file(COPY "${FONT}" DESTINATION "${QT_FONT_DEST}")
+                    message(STATUS "  Deployed font: ${FONT}")
+                endforeach()
+                message(STATUS "✅ Deployed fonts from ${FONT_DIR} to ${QT_FONT_DEST}")
+                set(FONT_COPIED TRUE)
+                break()
+            endif()
+        endforeach()
+        
+        if(NOT FONT_COPIED)
+            message(WARNING "⚠️ No font directories found. Please install fonts with:")
+            message(WARNING "  sudo apt install fonts-dejavu-core fonts-liberation")
         endif()
     else()
         message(STATUS "Qt fonts already deployed at ${QT_FONT_DEST}")
