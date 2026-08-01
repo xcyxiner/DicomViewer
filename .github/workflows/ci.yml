@@ -105,12 +105,27 @@ jobs:
 
     strategy:
       matrix:
-        os: [macos-14, ubuntu-24.04, windows-2022]
+        os: [ubuntu-24.04, windows-2022]
 
     runs-on: ${{ matrix.os }}
-
+    container:
+      ${{ matrix.os == 'ubuntu-24.04' && 'ghcr.io/xcyxiner/dicomviewer-ci:latest' || null }}
     steps:
     - uses: actions/checkout@v4
+
+    - name: Setup CMake (Windows)
+      if: matrix.os == 'windows-2022'
+      uses: lukka/get-cmake@latest
+
+    - name: Setup vcpkg (Windows)
+      if: matrix.os == 'windows-2022'
+      shell: pwsh
+      run: |
+        git clone https://github.com/Microsoft/vcpkg.git
+        .\vcpkg\bootstrap-vcpkg.bat
+        Add-Content -Path $env:GITHUB_ENV -Value "VCPKG_ROOT=$pwd\vcpkg"
+        Add-Content -Path $env:GITHUB_ENV -Value "CMAKE_TOOLCHAIN_FILE=$pwd\vcpkg\scripts\buildsystems\vcpkg.cmake"
+        Add-Content -Path $env:GITHUB_PATH -Value "$pwd\vcpkg"
 
     - name: Install static analyzers
       if: matrix.os == 'ubuntu-24.04'
@@ -128,6 +143,15 @@ jobs:
         Add-Content "$env:GITHUB_ENV" 'EnforceProcessCountAcrossBuilds=true'
 
     - name: Configure
+      if: matrix.os == 'ubuntu-24.04'
+      shell: bash
+      run: |
+        os="${{ matrix.os }}"
+        preset="ci-$(echo "$os" | cut -d'-' -f1)"
+        cmake --preset="$preset"
+      
+    - name: Configure
+      if: matrix.os == 'windows-2022'
       shell: pwsh
       run: cmake "--preset=ci-$("${{ matrix.os }}".split("-")[0])"
 
