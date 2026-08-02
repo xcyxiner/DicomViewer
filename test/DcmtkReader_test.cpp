@@ -9,8 +9,7 @@
 #include "infrastructure/dicom_io/HybridReader.h"  // 根据你的实际路径调整
 #include "infrastructure/dicom_io/VTKDicomAdaptReader.h"  // 根据你的实际路径调整
 #include "infrastructure/rendering/VtkAdaptRenderer.h"  // 根据你的实际路径调整
-std::string single_dicom =
-    "res/CT_small.dcm";  // 准备一个真实的DICOM文件
+std::string single_dicom = "res/CT_small.dcm";  // 准备一个真实的DICOM文件
 std::string multiframe_dicom =
     "res/enhanced_sample.dcm";  // 准备一个多帧的DICOM文件
 
