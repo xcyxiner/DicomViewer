@@ -6,7 +6,8 @@ find_package(GTest CONFIG REQUIRED)
 add_executable(DcmtkReader_test
     DcmtkReader_test.cpp
 )
-
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/../res/
+     DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/res/)
 # 4. 测试程序链接「测试专用库」
 target_link_libraries(DcmtkReader_test PRIVATE
     GTest::gtest_main

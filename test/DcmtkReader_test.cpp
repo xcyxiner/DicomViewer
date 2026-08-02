@@ -10,9 +10,9 @@
 #include "infrastructure/dicom_io/VTKDicomAdaptReader.h"  // 根据你的实际路径调整
 #include "infrastructure/rendering/VtkAdaptRenderer.h"  // 根据你的实际路径调整
 std::string single_dicom =
-    "/home/ubuntu/xcyxiner/DicomViewer/res/CT_small.dcm";  // 准备一个真实的DICOM文件
+    "res/CT_small.dcm";  // 准备一个真实的DICOM文件
 std::string multiframe_dicom =
-    "/home/ubuntu/xcyxiner/DicomViewer/res/enhanced_sample.dcm";  // 准备一个多帧的DICOM文件
+    "res/enhanced_sample.dcm";  // 准备一个多帧的DICOM文件
 
 TEST(DcmtkReaderTest, OpenValidFile)
 {
