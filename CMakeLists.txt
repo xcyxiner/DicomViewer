@@ -228,7 +228,9 @@ if(AUTO_DEPLOY_FONTS AND UNIX)
         message(STATUS "Qt fonts already deployed at ${QT_FONT_DEST}")
     endif()
 endif()
-
+# CMakeLists.txt
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/res/
+     DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/res/)
 
 # ---- Install rules ----
 
