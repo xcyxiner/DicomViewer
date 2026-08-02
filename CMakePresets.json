@@ -45,6 +45,19 @@
         "dev": false
       }
     },
+    {
+      "name": "window-vcpkg-release",
+      "hidden": true,
+      "cacheVariables": {
+        "DEPLOY_QT_PLUGINS": "ON",
+        "CMAKE_CXX_CLANG_TIDY": "", 
+        "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/triplets",
+        "VCPKG_TARGET_TRIPLET": "x64-windows-release"
+      },
+      "errors": {
+        "dev": false
+      }
+    },
    {
       "name": "ubuntu-vcpkg",
       "hidden": true,
@@ -208,7 +221,7 @@
     },
     {
       "name": "ci-windows",
-      "inherits": ["window-vcpkg","ci-build", "ci-win64", "dev-mode", "ci-multi-config"]
+      "inherits": ["window-vcpkg-release","ci-build", "ci-win64", "dev-mode", "ci-multi-config"]
     }
   ]
 }
