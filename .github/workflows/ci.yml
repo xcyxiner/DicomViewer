@@ -123,7 +123,6 @@ jobs:
         C:\vcpkg\bootstrap-vcpkg.bat
         Add-Content -Path $env:GITHUB_ENV -Value "VCPKG_ROOT=C:\vcpkg"
         Add-Content -Path $env:GITHUB_ENV -Value "CMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake"
-        Add-Content -Path $env:GITHUB_ENV -Value "VCPKG_MAX_CONCURRENCY=1"
         Add-Content -Path $env:GITHUB_PATH -Value "C:\vcpkg"
 
     - name: Install static analyzers
