@@ -115,16 +115,16 @@ jobs:
       if: matrix.os == 'windows-2022'
       uses: lukka/get-cmake@latest
 
-    - name: Setup vcpkg (Windows)
+    - name: Setup vcpkg and install dependencies
       if: matrix.os == 'windows-2022'
-      shell: pwsh
-      run: |
-        git clone https://github.com/Microsoft/vcpkg.git
-        .\vcpkg\bootstrap-vcpkg.bat
-        Add-Content -Path $env:GITHUB_ENV -Value "VCPKG_ROOT=$pwd\vcpkg"
-        Add-Content -Path $env:GITHUB_ENV -Value "CMAKE_TOOLCHAIN_FILE=$pwd\vcpkg\scripts\buildsystems\vcpkg.cmake"
-        Add-Content -Path $env:GITHUB_ENV -Value "VCPKG_MAX_CONCURRENCY=1"
-        Add-Content -Path $env:GITHUB_PATH -Value "$pwd\vcpkg"
+      uses: lukka/run-vcpkg@v11
+      with:
+        vcpkgDirectory: 'C:\vcpkg'
+        vcpkgGitCommit: 'a0400024711b283056538ac19ced80b91a83c24c'
+        runVcpkgFormatString: >-
+          ['install', 
+          '--x-buildtrees-root=C:\vcpkg_build',
+          '--triplet', 'x64-windows']
 
     - name: Install static analyzers
       if: matrix.os == 'ubuntu-24.04'
