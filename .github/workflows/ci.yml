@@ -151,7 +151,7 @@ jobs:
     - name: Configure
       if: matrix.os == 'windows-2022'
       shell: pwsh
-      run: cmake "--preset=ci-$("${{ matrix.os }}".split("-")[0])"
+      run: cmake "--preset=ci-windows"
 
     - name: Build
       run: cmake --build build --config Release -j 2
