@@ -212,13 +212,13 @@ jobs:
       shell: pwsh
       run: |
         # 找到 windeployqt.exe
-        $windeployqt = Get-ChildItem -Path $env:VCPKG_ROOT\installed\x64-windows\tools\qt6\bin -Filter windeployqt.exe -Recurse | Select-Object -First 1
+        $windeployqt = Get-ChildItem -Path $env:VCPKG_ROOT\installed\x64-windows-release\tools\qt6\bin -Filter windeployqt.exe -Recurse | Select-Object -First 1
         & $windeployqt.FullName --release --no-translations --qmldir ${{ github.workspace }} .\prefix\bin\*.exe
         
         # 手动补齐 vcpkg 里 Qt 依赖的第三方 DLL（windeployqt 可能漏掉）
         $extraDlls = @("double-conversion.dll","pcre2-16.dll","libpng16.dll","harfbuzz.dll","freetype.dll","brotlidec.dll","bz2.dll","brotlicommon.dll")
         foreach ($dll in $extraDlls) {
-          $src = Get-ChildItem -Path $env:VCPKG_ROOT\installed\x64-windows\bin -Filter $dll -Recurse | Select-Object -First 1
+          $src = Get-ChildItem -Path $env:VCPKG_ROOT\installed\x64-windows-release\bin -Filter $dll -Recurse | Select-Object -First 1
           if ($src) { Copy-Item $src.FullName -Destination .\prefix\bin\ }
         }
 
