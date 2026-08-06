@@ -176,7 +176,7 @@ jobs:
       run: cmake --build build --config Release -j 2
 
     - name: Install
-      run: cmake --install build --config Release --prefix prefix
+      run: cmake --install build --config Release --prefix "${PWD}/prefix"
 
     - name: Test
       working-directory: build
