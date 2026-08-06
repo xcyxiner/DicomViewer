@@ -198,12 +198,30 @@ jobs:
       if: matrix.os == 'windows-2022'
       shell: pwsh
       run: |
-        git clone https://github.com/Microsoft/vcpkg.git
-        .\vcpkg\bootstrap-vcpkg.bat
-        Add-Content -Path $env:GITHUB_ENV -Value "VCPKG_ROOT=$pwd\vcpkg"
-        Add-Content -Path $env:GITHUB_ENV -Value "CMAKE_TOOLCHAIN_FILE=$pwd\vcpkg\scripts\buildsystems\vcpkg.cmake"
-        Add-Content -Path $env:GITHUB_ENV -Value "VCPKG_MAX_CONCURRENCY=1"
-        Add-Content -Path $env:GITHUB_PATH -Value "$pwd\vcpkg"
+        git clone https://github.com/Microsoft/vcpkg.git C:\vcpkg
+        C:\vcpkg\bootstrap-vcpkg.bat
+        Add-Content -Path $env:GITHUB_ENV -Value "VCPKG_ROOT=C:\vcpkg"
+        Add-Content -Path $env:GITHUB_ENV -Value "CMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake"
+        Add-Content -Path $env:GITHUB_PATH -Value "C:\vcpkg"
+        Add-Content -Path $env:GITHUB_ENV -Value "VCPKG_OVERLAY_TRIPLETS=${env:GITHUB_WORKSPACE}/triplets"
+        Add-Content -Path $env:GITHUB_ENV -Value "VCPKG_TARGET_TRIPLET=x64-windows-release"
+        Add-Content -Path $env:GITHUB_ENV -Value "VCPKG_DEFAULT_HOST_TRIPLET=x64-windows-release"
+        $destDir = "C:\vcpkg\downloads"
+        New-Item -ItemType Directory -Force -Path $destDir | Out-Null
+        $sourceDir = Join-Path $env:GITHUB_WORKSPACE "vcpkg-cache/downloads"
+        $filesToCopy = @(
+            "k202009-libaec-v1.1.6.tar.gz",
+            "libuuid-1.0.3.tar.gz"
+        )
+        foreach ($fileName in $filesToCopy) {
+            $sourceFile = Join-Path $sourceDir $fileName
+            if (Test-Path $sourceFile) {
+                Copy-Item $sourceFile -Destination $destDir
+                Write-Host "✅ Copied $fileName"
+            } else {
+                Write-Host "⚠️ Warning: $fileName not found in cache, will be downloaded."
+            }
+        }
 
     # ---- 配置 + 构建 + 安装 ----
     - name: Configure
@@ -217,29 +235,13 @@ jobs:
     - name: Configure
       if: matrix.os == 'windows-2022'
       shell: pwsh
-      run: cmake "--preset=ci-$("${{ matrix.os }}".split("-")[0])"
+      run: cmake "--preset=ci-windows"
 
     - name: Build
       run: cmake --build build --config Release -j 2
 
     - name: Install
-      run: cmake --install build --config Release --prefix prefix
-
-    # ---- Windows: 用 windeployqt 收集 Qt 依赖 ----
-    - name: Deploy Qt (Windows)
-      if: matrix.os == 'windows-2022'
-      shell: pwsh
-      run: |
-        # 找到 windeployqt.exe
-        $windeployqt = Get-ChildItem -Path $env:VCPKG_ROOT\installed\x64-windows-release\tools\qt6\bin -Filter windeployqt.exe -Recurse | Select-Object -First 1
-        & $windeployqt.FullName --release --no-translations --qmldir ${{ github.workspace }} .\prefix\bin\*.exe
-        
-        # 手动补齐 vcpkg 里 Qt 依赖的第三方 DLL（windeployqt 可能漏掉）
-        $extraDlls = @("double-conversion.dll","pcre2-16.dll","libpng16.dll","harfbuzz.dll","freetype.dll","brotlidec.dll","bz2.dll","brotlicommon.dll")
-        foreach ($dll in $extraDlls) {
-          $src = Get-ChildItem -Path $env:VCPKG_ROOT\installed\x64-windows-release\bin -Filter $dll -Recurse | Select-Object -First 1
-          if ($src) { Copy-Item $src.FullName -Destination .\prefix\bin\ }
-        }
+      run: cmake --install build --config Release --prefix "${PWD}/prefix"
 
     # ---- 打包 ----
     - name: Package (Windows)
