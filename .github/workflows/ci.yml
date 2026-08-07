@@ -181,82 +181,37 @@ jobs:
     - name: Test
       working-directory: build
       run: ctest --output-on-failure --no-tests=error -C Release -j 2
+      
+    - name: Upload prefix (installation artifacts)
+      uses: actions/upload-artifact@v4
+      with:
+        name: installed-${{ matrix.os }}  # 区分不同平台
+        path: prefix/                     # 只上传安装目录
   package:
     needs: [test]
     strategy:
       matrix:
-        os: [ubuntu-24.04, windows-2022]
-    runs-on: ${{ matrix.os }}
-    container:
-      ${{ matrix.os == 'ubuntu-24.04' && 'ghcr.io/xcyxiner/dicomviewer-ci:latest' || null }}
+        os: [ubuntu-24.04]
+    runs-on: ubuntu-24.04
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Download Windows artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: installed-windows-2022
+        path: windows-package
 
-    # ---- Windows 准备 vcpkg + Qt ----
-    - name: Setup vcpkg (Windows)
-      if: matrix.os == 'windows-2022'
-      shell: pwsh
+    - name: Download Ubuntu artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: installed-ubuntu-24.04
+        path: ubuntu-package
+
+    - name: Create final packages
       run: |
-        git clone https://github.com/Microsoft/vcpkg.git C:\vcpkg
-        C:\vcpkg\bootstrap-vcpkg.bat
-        Add-Content -Path $env:GITHUB_ENV -Value "VCPKG_ROOT=C:\vcpkg"
-        Add-Content -Path $env:GITHUB_ENV -Value "CMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake"
-        Add-Content -Path $env:GITHUB_PATH -Value "C:\vcpkg"
-        Add-Content -Path $env:GITHUB_ENV -Value "VCPKG_OVERLAY_TRIPLETS=${env:GITHUB_WORKSPACE}/triplets"
-        Add-Content -Path $env:GITHUB_ENV -Value "VCPKG_TARGET_TRIPLET=x64-windows-release"
-        Add-Content -Path $env:GITHUB_ENV -Value "VCPKG_DEFAULT_HOST_TRIPLET=x64-windows-release"
-        $destDir = "C:\vcpkg\downloads"
-        New-Item -ItemType Directory -Force -Path $destDir | Out-Null
-        $sourceDir = Join-Path $env:GITHUB_WORKSPACE "vcpkg-cache/downloads"
-        $filesToCopy = @(
-            "k202009-libaec-v1.1.6.tar.gz",
-            "libuuid-1.0.3.tar.gz"
-        )
-        foreach ($fileName in $filesToCopy) {
-            $sourceFile = Join-Path $sourceDir $fileName
-            if (Test-Path $sourceFile) {
-                Copy-Item $sourceFile -Destination $destDir
-                Write-Host "✅ Copied $fileName"
-            } else {
-                Write-Host "⚠️ Warning: $fileName not found in cache, will be downloaded."
-            }
-        }
+        [ -d ubuntu-package ] && (cd ubuntu-package && tar -czf ../DicomViewer-linux-x64.tar.gz .)
+        [ -d windows-package ] && (cd windows-package && zip -r ../DicomViewer-windows-x64.zip .)
 
-    # ---- 配置 + 构建 + 安装 ----
-    - name: Configure
-      if: matrix.os == 'ubuntu-24.04'
-      shell: bash
-      run: |
-        os="${{ matrix.os }}"
-        preset="ci-$(echo "$os" | cut -d'-' -f1)"
-        cmake --preset="$preset"
-      
-    - name: Configure
-      if: matrix.os == 'windows-2022'
-      shell: pwsh
-      run: cmake "--preset=ci-windows"
-
-    - name: Build
-      run: cmake --build build --config Release -j 2
-
-    - name: Install
-      run: cmake --install build --config Release --prefix "${PWD}/prefix"
-
-    # ---- 打包 ----
-    - name: Package (Windows)
-      if: matrix.os == 'windows-2022'
-      shell: pwsh
-      run: |
-        Compress-Archive -Path .\prefix\* -DestinationPath DicomViewer-windows-x64.zip
-
-    - name: Package (Linux)
-      if: matrix.os == 'ubuntu-24.04'
-      run: |
-        cd prefix
-        tar -czvf ../DicomViewer-linux-x64.tar.gz .
-
-    # ---- 上传为 artifact（方便调试和跨 job 传递）----
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
