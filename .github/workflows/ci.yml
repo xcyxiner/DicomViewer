@@ -116,14 +116,17 @@ jobs:
 
     - name: Setup CMake (Windows)
       if: matrix.os == 'windows-2022'
-      uses: lukka/get-cmake@latest
+      uses: lukka/get-cmake@v3.29.3
 
     - name: Setup vcpkg (Windows)
       if: matrix.os == 'windows-2022'
       shell: pwsh
       run: |
+        $vcpkgCommit = "a0400024711b283056538ac19ced80b91a83c24c"
         git clone https://github.com/Microsoft/vcpkg.git C:\vcpkg
-        C:\vcpkg\bootstrap-vcpkg.bat
+        cd C:\vcpkg
+        git checkout $vcpkgCommit
+        .\bootstrap-vcpkg.bat
         Add-Content -Path $env:GITHUB_ENV -Value "VCPKG_ROOT=C:\vcpkg"
         Add-Content -Path $env:GITHUB_ENV -Value "CMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake"
         Add-Content -Path $env:GITHUB_PATH -Value "C:\vcpkg"
