@@ -157,6 +157,7 @@ jobs:
             }
         }
     - name: Add NuGet sources
+      if: matrix.os == 'windows-2022'
       shell: pwsh
       run: |
         .$(${{ env.VCPKG_EXE }} fetch nuget) `
