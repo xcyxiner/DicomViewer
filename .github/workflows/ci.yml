@@ -117,16 +117,19 @@ jobs:
 
     - name: Setup vcpkg (Windows)
       if: matrix.os == 'windows-2022'
+      uses: lukka/run-vcpkg@v11
+      with:
+        vcpkgDirectory: 'C:\vcpkg'
+        vcpkgJsonGlob: 'vcpkg.json'
+      env:
+        VCPKG_OVERLAY_TRIPLETS: ${{ github.workspace }}/triplets
+        VCPKG_TARGET_TRIPLET: x64-windows-release
+        VCPKG_DEFAULT_HOST_TRIPLET: x64-windows-release
+
+    - name: Copy source tarballs to vcpkg downloads (Windows)
+      if: matrix.os == 'windows-2022'
       shell: pwsh
       run: |
-        git clone https://github.com/Microsoft/vcpkg.git C:\vcpkg
-        C:\vcpkg\bootstrap-vcpkg.bat
-        Add-Content -Path $env:GITHUB_ENV -Value "VCPKG_ROOT=C:\vcpkg"
-        Add-Content -Path $env:GITHUB_ENV -Value "CMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake"
-        Add-Content -Path $env:GITHUB_PATH -Value "C:\vcpkg"
-        Add-Content -Path $env:GITHUB_ENV -Value "VCPKG_OVERLAY_TRIPLETS=${env:GITHUB_WORKSPACE}/triplets"
-        Add-Content -Path $env:GITHUB_ENV -Value "VCPKG_TARGET_TRIPLET=x64-windows-release"
-        Add-Content -Path $env:GITHUB_ENV -Value "VCPKG_DEFAULT_HOST_TRIPLET=x64-windows-release"
         $destDir = "C:\vcpkg\downloads"
         New-Item -ItemType Directory -Force -Path $destDir | Out-Null
         $sourceDir = Join-Path $env:GITHUB_WORKSPACE "vcpkg-cache/downloads"
