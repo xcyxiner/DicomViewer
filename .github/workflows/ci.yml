@@ -139,6 +139,7 @@ jobs:
         ) | ForEach-Object {
           Add-Content -Path $env:GITHUB_ENV -Value $_
         }
+        Add-Content -Path $env:GITHUB_ENV -Value "FEED_URL=$FEED_URL"
         $destDir = "C:\vcpkg\downloads"
         New-Item -ItemType Directory -Force -Path $destDir | Out-Null
         $sourceDir = Join-Path $env:GITHUB_WORKSPACE "vcpkg-cache/downloads"
@@ -155,7 +156,21 @@ jobs:
                 Write-Host "⚠️ Warning: $fileName not found in cache, will be downloaded."
             }
         }
+    - name: Add NuGet sources
+      shell: pwsh
+      run: |
+        .$(${{ env.VCPKG_EXE }} fetch nuget) `
+          sources add `
+          -Source "${{ env.FEED_URL }}" `
+          -StorePasswordInClearText `
+          -Name GitHubPackages `
+          -UserName "${{ env.GITHUB_ACTOR }}" `
+          -Password "${{ secrets.TOKEN }}"
+        .$(${{ env.VCPKG_EXE }} fetch nuget) `
+          setapikey "${{ secrets.TOKEN }}" `
+          -Source "${{ env.FEED_URL }}"        
 
+            
     - name: Install static analyzers
       if: matrix.os == 'ubuntu-24.04'
       run: >-
