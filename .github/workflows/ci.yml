@@ -143,6 +143,7 @@ jobs:
           Add-Content -Path $env:GITHUB_ENV -Value $_
         }
         Add-Content -Path $env:GITHUB_ENV -Value "FEED_URL=$FEED_URL"
+        Add-Content -Path $env:GITHUB_ENV -Value "VCPKG_NUGET_TIMEOUT=1800"
         $destDir = "C:\vcpkg\downloads"
         New-Item -ItemType Directory -Force -Path $destDir | Out-Null
         $sourceDir = Join-Path $env:GITHUB_WORKSPACE "vcpkg-cache/downloads"
