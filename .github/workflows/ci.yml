@@ -166,9 +166,9 @@ jobs:
           -StorePasswordInClearText `
           -Name GitHubPackages `
           -UserName "xcyxiner" `
-          -Password "${{ secrets.VCPKG_NUGET_TOKEN }}"
+          -Password "${{ env.VCPKG_NUGET_TOKEN }}"
         .$(${{ env.VCPKG_EXE }} fetch nuget) `
-          setapikey "${{ secrets.VCPKG_NUGET_TOKEN }}" `
+          setapikey "${{ env.VCPKG_NUGET_TOKEN }}" `
           -Source "${{ env.FEED_URL }}"        
 
             
