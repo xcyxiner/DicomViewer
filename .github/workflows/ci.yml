@@ -149,7 +149,8 @@ jobs:
         $sourceDir = Join-Path $env:GITHUB_WORKSPACE "vcpkg-cache/downloads"
         $filesToCopy = @(
             "k202009-libaec-v1.1.6.tar.gz",
-            "libuuid-1.0.3.tar.gz"
+            "libuuid-1.0.3.tar.gz",
+            "gl2ps-1.4.2.tgz"
         )
         foreach ($fileName in $filesToCopy) {
             $sourceFile = Join-Path $sourceDir $fileName
