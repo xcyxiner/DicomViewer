@@ -11,14 +11,14 @@
         "/usr/include/**",
         "/usr/local/include/**",
         "/usr/include/x86_64-linux-gnu/**",
-        "/home/ubuntu/xcyxiner/DicomViewer/vcpkg_installed/x64-linux/include/Qt6",
-        "/home/ubuntu/xcyxiner/DicomViewer/vcpkg_installed/x64-linux/include/Qt6/QtWidgets",
-        "/home/ubuntu/xcyxiner/DicomViewer/vcpkg_installed/x64-linux/include/Qt6/QtCore",
-        "/home/ubuntu/xcyxiner/DicomViewer/vcpkg_installed/x64-linux/include/Qt6/QtGui",
-        "/home/ubuntu/xcyxiner/DicomViewer/vcpkg_installed/x64-linux/include",
-        "/home/ubuntu/xcyxiner/DicomViewer/vcpkg_installed/x64-linux/include/vtk-9.3",
-        "/home/ubuntu/xcyxiner/DicomViewer/source",
-        "/home/ubuntu/xcyxiner/DicomViewer/build/DicomViewer_exe_autogen/include"
+        "${workspaceFolder}/build/vcpkg_installed/x64-linux/include/Qt6",
+        "${workspaceFolder}/build/vcpkg_installed/x64-linux/include/Qt6/QtWidgets",
+        "${workspaceFolder}/build/vcpkg_installed/x64-linux/include/Qt6/QtCore",
+        "${workspaceFolder}/build/vcpkg_installed/x64-linux/include/Qt6/QtGui",
+        "${workspaceFolder}/build/vcpkg_installed/x64-linux/include",
+        "${workspaceFolder}/build/vcpkg_installed/x64-linux/include/vtk-9.3",
+        "${workspaceFolder}/source",
+        "${workspaceFolder}/build/DicomViewer_exe_autogen/include"
       ]
     }
   ],
