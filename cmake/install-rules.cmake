@@ -4,6 +4,17 @@ install(
     RUNTIME DESTINATION bin
 )
 
+# 安装 DCMTK 字典文件
+if(UNIX)
+    # 使用 CMakeLists.txt 中已找到的 DCM_DICT_PATH
+    if(DCM_DICT_PATH)
+        install(FILES "${DCM_DICT_PATH}"
+            DESTINATION share/dcmtk
+        )
+        message(STATUS "Will install dicom.dic from: ${DCM_DICT_PATH}")
+    endif()
+endif()
+
 if(UNIX)
     # 获取插件目录路径
     set(_triplet "${VCPKG_TARGET_TRIPLET}")

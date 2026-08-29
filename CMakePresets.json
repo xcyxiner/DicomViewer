@@ -22,9 +22,29 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_CXX_FLAGS": "",
-        "CMAKE_PREFIX_PATH": "${sourceDir}/vcpkg_installed/x64-linux/debug;${sourceDir}/vcpkg_installed/x64-linux",
-        "AUTO_DEPLOY_FONTS":"ON",
-        "AUTO_TESTING":"ON"
+        "CMAKE_PREFIX_PATH": "${sourceDir}/build/vcpkg_installed/x64-linux/debug;${sourceDir}/build/vcpkg_installed/x64-linux",
+        "AUTO_DEPLOY_FONTS": "ON",
+        "AUTO_TESTING": "ON"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "wsl-vcpkg-debug",
+      "displayName": "WSL vcpkg",
+      "description": "Debug build on WSL (x64-linux)",
+      "binaryDir": "${sourceDir}/build",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CXX_FLAGS": "",
+        "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/triplets",
+        "VCPKG_TARGET_TRIPLET": "x64-linux",
+        "AUTO_DEPLOY_FONTS": "ON",
+        "AUTO_TESTING": "ON"
       },
       "condition": {
         "type": "equals",

@@ -1,4 +1,7 @@
 #include <QApplication>
+#include <QCoreApplication>
+#include <QDir>
+#include <QFile>
 
 #include "infrastructure/cache/MemoryFrameCache.h"
 #include "infrastructure/container/ServiceContainer.h"
@@ -12,6 +15,18 @@
 auto main(int argc, char* argv[]) -> int
 {
   QApplication application(argc, argv);
+
+  // 设置 DCMTK 字典路径（打包后使用相对路径）
+#ifdef __linux__
+  {
+    QString appDir = QCoreApplication::applicationDirPath();
+    QString dictPath =
+        QDir(appDir).absoluteFilePath("../share/dcmtk/dicom.dic");
+    if (QFile::exists(dictPath)) {
+      qputenv("DCMDICTPATH", dictPath.toLocal8Bit());
+    }
+  }
+#endif
 
   // Composition Root — 注册所有服务
   ServiceContainer container;
