@@ -1,12 +1,9 @@
 #include "VtkAdaptRenderer.h"
 
-#include <vtkActor.h>
-#include <vtkConeSource.h>
 #include <vtkImageActor.h>
 #include <vtkImageFlip.h>
-#include <vtkImageMapToWindowLevelColors.h>
+#include <vtkImageMapper3D.h>
 #include <vtkMatrix3x3.h>
-#include <vtkPolyDataMapper.h>
 
 VtkAdaptRenderer::VtkAdaptRenderer()
 {
@@ -16,7 +13,6 @@ VtkAdaptRenderer::VtkAdaptRenderer()
   imageProperty = vtkSmartPointer<vtkImageProperty>::New();
   style = vtkSmartPointer<vtkInteractorStyleImage>::New();
   m_imageActor->SetProperty(imageProperty);
-  m_windowLevelColors = vtkSmartPointer<vtkImageMapToWindowLevelColors>::New();
 }
 
 void VtkAdaptRenderer::setRenderTarget(vtkSmartPointer<vtkRenderWindow> window)
@@ -43,12 +39,6 @@ void VtkAdaptRenderer::render(const IFrameCache::FramePtr& frame,
           std::cerr << "Error: imageData is null!" << std::endl;
           return;
         }
-        // m_windowLevelColors->SetInputData(imageData);
-        // m_imageActor->GetMapper()->SetInputConnection(
-        //     m_windowLevelColors->GetOutputPort());
-        // m_windowLevelColors->SetWindow(settings.getWindowWidth());
-        // m_windowLevelColors->SetLevel(settings.getWindowCenter());
-        // m_windowLevelColors->Update();
         m_imageActor->GetMapper()->SetInputData(imageData);
         imageProperty->SetColorWindow(settings.getWindowWidth());
         imageProperty->SetColorLevel(settings.getWindowCenter());
@@ -61,66 +51,6 @@ void VtkAdaptRenderer::render(const IFrameCache::FramePtr& frame,
 }
 
 void VtkAdaptRenderer::reset() {}
-
-void VtkAdaptRenderer::CompareImageData(vtkImageData* img1, vtkImageData* img2)
-{
-  // 检查维度和数据类型
-  int dims1[3], dims2[3];
-  img1->GetDimensions(dims1);
-  img2->GetDimensions(dims2);
-  if (dims1[0] != dims2[0] || dims1[1] != dims2[1] || dims1[2] != dims2[2]) {
-    std::cerr << "Dimensions do not match!" << std::endl;
-    return;
-  }
-  int scalarType1 = img1->GetScalarType();
-  int scalarType2 = img2->GetScalarType();
-  if (scalarType1 != scalarType2) {
-    std::cerr << "Scalar types differ!" << std::endl;
-    return;
-  }
-  // 获取像素指针（假设均为 unsigned short）
-  auto* ptr1 = static_cast<unsigned short*>(img1->GetScalarPointer());
-  auto* ptr2 = static_cast<unsigned short*>(img2->GetScalarPointer());
-  int totalPixels = dims1[0] * dims1[1] * dims1[2];
-  // 统计差异
-  double sumDiff = 0.0;
-  double maxDiff = 0.0;
-  int diffCount = 0;
-  int firstDiffIdx = -1;
-  unsigned short firstVal1 = 0, firstVal2 = 0;
-  for (int i = 0; i < totalPixels; ++i) {
-    unsigned short v1 = ptr1[i];
-    unsigned short v2 = ptr2[i];
-    double diff = std::abs(static_cast<double>(v1) - static_cast<double>(v2));
-    if (diff >= 0.0) {
-      sumDiff += diff;
-      if (diff > maxDiff) {
-        maxDiff = diff;
-      }
-      diffCount++;
-      if (firstDiffIdx == -1) {
-        firstDiffIdx = i;
-        firstVal1 = v1;
-        firstVal2 = v2;
-      }
-    }
-  }
-  double meanDiff = (diffCount > 0) ? (sumDiff / diffCount) : 0.0;
-  std::cout << "=== Pixel Comparison ===" << std::endl;
-  std::cout << "Total pixels: " << totalPixels << std::endl;
-  std::cout << "Number of differing pixels: " << diffCount << std::endl;
-  std::cout << "Mean absolute difference: " << meanDiff << std::endl;
-  std::cout << "Max absolute difference: " << maxDiff << std::endl;
-  if (firstDiffIdx != -1) {
-    std::cout << "First diff at linear index " << firstDiffIdx << " (row "
-              << firstDiffIdx / dims1[0] << ", col " << firstDiffIdx % dims1[0]
-              << ")" << ": img1=" << firstVal1 << ", img2=" << firstVal2
-              << std::endl;
-  } else {
-    std::cout << "All pixels are identical (within numeric precision)."
-              << std::endl;
-  }
-}
 
 vtkSmartPointer<vtkImageData> VtkAdaptRenderer::convertFrameToImageData(
     const std::shared_ptr<Frame>& frame)
