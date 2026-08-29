@@ -11,13 +11,13 @@
 #include "qtmetamacros.h"
 #include "ui_GUICenter.h"
 
-GUICenter::GUICenter(QWidget* parent)
+GUICenter::GUICenter(SeriesViewModel* viewModel, QWidget* parent)
     : QWidget(parent)
     , ui(new Ui::GUICenter)
+    , m_seriesViewModel(viewModel)
 {
   ui->setupUi(this);
   // initvtkTest();
-  m_seriesViewModel = new SeriesViewModel(this);
   m_vtkWidget = new QVTKOpenGLNativeWidget(this);
 
   m_renderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();

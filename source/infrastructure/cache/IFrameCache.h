@@ -10,7 +10,7 @@ class IFrameCache
 {
 public:
     explicit IFrameCache();
-    ~IFrameCache()=default;
+    virtual ~IFrameCache()=default;
 
 public:
     using FramePtr = std::variant<std::shared_ptr<Frame>, vtkSmartPointer<vtkImageData>,nullptr_t>;

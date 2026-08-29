@@ -23,7 +23,8 @@ class GUICenter : public QWidget
 {
   Q_OBJECT
 public:
-  explicit GUICenter(QWidget* parent = nullptr);
+  explicit GUICenter(SeriesViewModel* viewModel,
+                     QWidget* parent = nullptr);
   ~GUICenter();
 
 public:
