@@ -1,22 +1,27 @@
 
 #include "SeriesViewModel.h"
 
-#include "infrastructure/cache/MemoryFrameCache.h"
-#include "infrastructure/dicom_io/HybridReader.h"
-#include "infrastructure/dicom_io/VTKDicomAdaptReader.h"
-#include "infrastructure/rendering/VtkAdaptRenderer.h"
-#include "infrastructure/task/QtTaskQueue.h"
-
-SeriesViewModel::SeriesViewModel(QObject* parent)
+SeriesViewModel::SeriesViewModel(std::shared_ptr<IImageRenderer> renderer,
+                                 std::shared_ptr<IDicomReader> reader,
+                                 std::shared_ptr<ITaskQueue> taskQueue,
+                                 std::shared_ptr<IFrameCache> frameCache,
+                                 QObject* parent)
     : QObject(parent)
+    , m_imageRenderer(std::move(renderer))
+    , m_stackDisplaySet(std::make_shared<StackDisplaySet>())
+    , m_dicomReader(std::move(reader))
+    , m_taskQueue(std::move(taskQueue))
+    , m_frameCache(std::move(frameCache))
 {
-  m_imageRenderer = std::make_shared<VtkAdaptRenderer>();
-  m_stackDisplaySet = std::make_shared<StackDisplaySet>();
-  m_dicomReader = std::make_unique<VTKDicomAdaptReader>();
-  m_taskQueue = std::make_unique<QtTaskQueue>();
-  m_frameCache = std::make_unique<MemoryFrameCache>();
   m_loadSeriesUseCase = std::make_unique<LoadSeriesUseCase>(
       *m_dicomReader, *m_taskQueue, *m_frameCache);
+}
+
+SeriesViewModel::~SeriesViewModel()
+{
+  if (m_workerThread.joinable()) {
+    m_workerThread.join();
+  }
 }
 
 void SeriesViewModel::setRenderWindow(vtkSmartPointer<vtkRenderWindow> window)
@@ -30,24 +35,31 @@ void SeriesViewModel::render()
       m_stackDisplaySet->getCurrentIndex());
   int frameIndex = m_stackDisplaySet->getCurrentIndex();
   auto frame = m_frameCache->get(sopUid, frameIndex);
-  using FrameInfoType = std::decay_t<decltype(frame)>;
-  if constexpr (std::is_same_v<FrameInfoType, nullptr_t>) {
-    return;
-  }
+  // std::visit 已在 renderer 内部处理 nullptr_t 分支
   m_imageRenderer->render(frame, m_stackDisplaySet->getDisplaySettings());
 }
 
 void SeriesViewModel::loadSeries(const std::string& path)
 {
+  // 等待上一次加载完成
+  if (m_workerThread.joinable()) {
+    m_workerThread.join();
+  }
+
   auto future = m_loadSeriesUseCase->loadSeriesAsync(path);
-  auto watcher =
-      std::make_shared<std::future<std::shared_ptr<StackDisplaySet>>>(
-          std::move(future));
-  std::thread(
-      [this, watcher]()
+
+  m_workerThread = std::thread(
+      [this, future = std::move(future)]() mutable
       {
-        m_stackDisplaySet = watcher->get();
-        emit imageChanged();
-      })
-      .detach();
+        auto result = std::move(future).get();
+        // 回到主线程更新数据并发信号
+        QMetaObject::invokeMethod(
+            this,
+            [this, result = std::move(result)]() mutable
+            {
+              m_stackDisplaySet = std::move(result);
+              emit imageChanged();
+            },
+            Qt::QueuedConnection);
+      });
 }

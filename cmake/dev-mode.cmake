@@ -25,4 +25,13 @@ endif()
 include(cmake/lint-targets.cmake)
 include(cmake/spell-targets.cmake)
 
+# ---- Git hooks setup ----
+add_custom_target(
+    setup-hooks
+    COMMAND git config core.hooksPath .githooks
+    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
+    COMMENT "Setting git hooks path to .githooks"
+    VERBATIM
+)
+
 add_folders(Project)

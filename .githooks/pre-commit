@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# pre-commit hook — runs the same checks as CI lint stage
+# Install: git config core.hooksPath .githooks
+
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+
+echo "==> Running clang-format check..."
+cmake -D FORMAT_COMMAND=clang-format-18 -P "$REPO_ROOT/cmake/lint.cmake"
+
+echo "==> Running codespell check..."
+cmake -P "$REPO_ROOT/cmake/spell.cmake"
+
+echo "✓ All pre-commit checks passed."

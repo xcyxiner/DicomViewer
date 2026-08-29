@@ -36,6 +36,8 @@ set(SRC
     "source/infrastructure/cache/MemoryFrameCache.h"
     "source/infrastructure/cache/IFrameCache.cpp"
     "source/infrastructure/cache/MemoryFrameCache.cpp"
+    "source/infrastructure/container/ServiceContainer.cpp"
+    "source/infrastructure/container/ServiceContainer.h"
     "source/infrastructure/task/QtTaskQueue.cpp"
     "source/infrastructure/task/ITaskQueue.h"
     "source/infrastructure/task/QtTaskQueue.h"

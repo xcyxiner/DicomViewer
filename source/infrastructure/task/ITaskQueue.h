@@ -6,7 +6,7 @@ class ITaskQueue
 {
 public:
     explicit ITaskQueue();
-    ~ITaskQueue()=default;
+    virtual ~ITaskQueue()=default;
 public:
   virtual std::future<void> submit(std::function<void()> task,
                                    int priority = 0) = 0;
