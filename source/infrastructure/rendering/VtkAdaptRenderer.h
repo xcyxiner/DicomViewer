@@ -6,10 +6,8 @@
 #include <vtkRenderer.h>
 #include "vtkRenderWindow.h"
 #include "vtkImageProperty.h"
-#include "vtkImageMapToWindowLevelColors.h"
 #include "vtkInteractorStyleImage.h"
 #include "vtkRenderWindowInteractor.h"
-#include "vtkImageMapper3D.h"
 class VtkAdaptRenderer : public IImageRenderer
 {
 public:
@@ -22,7 +20,6 @@ public:
               const DisplaySettings& settings) override;
   void reset() override;
 
-  void CompareImageData(vtkImageData* img1, vtkImageData* img2);
   vtkSmartPointer<vtkImageData> convertFrameToImageData(
     const std::shared_ptr<Frame>& frame);
 private:
@@ -30,7 +27,6 @@ private:
    vtkSmartPointer<vtkRenderer> m_renderer;
    vtkSmartPointer<vtkRenderWindow> m_renderWindow;
    vtkSmartPointer<vtkImageProperty> imageProperty;
-   vtkSmartPointer<vtkImageMapToWindowLevelColors> m_windowLevelColors;
    vtkSmartPointer<vtkInteractorStyleImage> style;
    vtkSmartPointer<vtkRenderWindowInteractor> interactor;
 };

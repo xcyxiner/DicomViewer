@@ -32,6 +32,8 @@ set(SRC
     "source/infrastructure/rendering/IImageRenderer.cpp"
     "source/infrastructure/rendering/VtkAdaptRenderer.cpp"
     "source/infrastructure/rendering/VtkAdaptRenderer.h"
+    "source/infrastructure/utils/ImageDataComparator.cpp"
+    "source/infrastructure/utils/ImageDataComparator.h"
     "source/infrastructure/cache/IFrameCache.h"
     "source/infrastructure/cache/MemoryFrameCache.h"
     "source/infrastructure/cache/IFrameCache.cpp"
