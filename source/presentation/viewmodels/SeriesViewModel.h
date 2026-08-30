@@ -27,6 +27,8 @@ public:
     void render();
     void loadSeries(const std::string& path);
     void fitToWindow();
+    void resetWindowLevel();
+    void setWindowLevel(double windowWidth, double windowCenter);
 
 signals:
     void imageChanged();

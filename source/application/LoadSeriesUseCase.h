@@ -5,7 +5,7 @@
 #include "infrastructure/cache/IFrameCache.h"
 #include <future>
 #include "domain/model/StackDisplaySet.h"
-class LoadSeriesUseCase 
+class LoadSeriesUseCase
 {
 public:
     explicit LoadSeriesUseCase();

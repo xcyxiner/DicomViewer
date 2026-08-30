@@ -30,6 +30,9 @@
    <property name="text">
     <string>Default</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+0</string>
+   </property>
   </action>
   <action name="actionAll">
    <property name="text">
@@ -65,7 +68,7 @@
     <string>Fit to Window</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+0</string>
+    <string>Ctrl+4</string>
    </property>
   </action>
   <addaction name="menuWindowLevel"/>

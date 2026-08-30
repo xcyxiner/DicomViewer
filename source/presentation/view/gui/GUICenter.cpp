@@ -70,6 +70,20 @@ void GUICenter::fitToWindow()
   }
 }
 
+void GUICenter::resetWindowLevel()
+{
+  if (m_hasImage) {
+    m_seriesViewModel->resetWindowLevel();
+  }
+}
+
+void GUICenter::setWindowLevel(double windowWidth, double windowCenter)
+{
+  if (m_hasImage) {
+    m_seriesViewModel->setWindowLevel(windowWidth, windowCenter);
+  }
+}
+
 void GUICenter::resizeEvent(QResizeEvent* event)
 {
   QWidget::resizeEvent(event);

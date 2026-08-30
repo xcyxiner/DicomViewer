@@ -3,6 +3,7 @@
 
 #include <vtkDICOMMetaData.h>
 #include <vtkDICOMTagPath.h>
+#include <vtkDoubleArray.h>
 #include <vtkFieldData.h>
 #include <vtkImageData.h>
 #include <vtkStringArray.h>
@@ -49,6 +50,22 @@ IFrameCache::FramePtr VTKDicomAdaptReader::readFrame(int index)
   uidArray->InsertNextValue(sopUID);
 
   imageData->GetFieldData()->AddArray(uidArray);
+
+  // 提取窗宽窗位 (0028,1050 / 0028,1051) — 多值时取第一个
+  vtkDICOMValue wcValue = meta->GetAttributeValue(0, DC::WindowCenter);
+  vtkDICOMValue wwValue = meta->GetAttributeValue(0, DC::WindowWidth);
+  if (wcValue.IsValid() && wwValue.IsValid()) {
+    auto wcArray = vtkSmartPointer<vtkDoubleArray>::New();
+    wcArray->SetName("WindowCenter");
+    wcArray->InsertNextValue(wcValue.AsDouble());
+    imageData->GetFieldData()->AddArray(wcArray);
+
+    auto wwArray = vtkSmartPointer<vtkDoubleArray>::New();
+    wwArray->SetName("WindowWidth");
+    wwArray->InsertNextValue(wwValue.AsDouble());
+    imageData->GetFieldData()->AddArray(wwArray);
+  }
+
   return imageData;
 }
 

@@ -25,6 +25,8 @@ public:
   void onOpenFolder();
   void showEvent();
   void fitToWindow();
+  void resetWindowLevel();
+  void setWindowLevel(double windowWidth, double windowCenter);
 
 protected:
   void resizeEvent(QResizeEvent* event) override;

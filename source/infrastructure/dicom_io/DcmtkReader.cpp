@@ -103,6 +103,20 @@ std::unique_ptr<Frame> DcmtkReader::readFrameInfo(int index)
     }
     frame->setSlope(slope);
     frame->setIntercept(intercept);
+
+    // 窗宽窗位 (0028,1050 / 0028,1051) — 可能是多值，取第一个
+    OFString windowCenterStr;
+    OFString windowWidthStr;
+    if (m_dataset->findAndGetOFString(DCM_WindowCenter, windowCenterStr, 0)
+            .good())
+    {
+      frame->setWindowCenter(std::atof(windowCenterStr.c_str()));
+    }
+    if (m_dataset->findAndGetOFString(DCM_WindowWidth, windowWidthStr, 0)
+            .good())
+    {
+      frame->setWindowWidth(std::atof(windowWidthStr.c_str()));
+    }
   }
   return frame;
 }

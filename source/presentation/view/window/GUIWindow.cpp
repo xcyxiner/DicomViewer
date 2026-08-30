@@ -45,9 +45,7 @@ void GUIWindow::createMenu()
           &WindowLevelMenu::windowLevelDefault,
           this,
           [this]()
-          {
-            // TODO: implement default window level
-          });
+          { dynamic_cast<GUICenter*>(m_childWidget)->resetWindowLevel(); });
   connect(m_windowLevelMenu,
           &WindowLevelMenu::windowLevelAll,
           this,
@@ -60,21 +58,24 @@ void GUIWindow::createMenu()
           this,
           [this]()
           {
-            // TODO: implement brain window level
+            // Brain: WW=80, WC=40
+            dynamic_cast<GUICenter*>(m_childWidget)->setWindowLevel(80, 40);
           });
   connect(m_windowLevelMenu,
           &WindowLevelMenu::windowLevelLung,
           this,
           [this]()
           {
-            // TODO: implement lung window level
+            // Lung: WW=1500, WC=-600
+            dynamic_cast<GUICenter*>(m_childWidget)->setWindowLevel(1500, -600);
           });
   connect(m_windowLevelMenu,
           &WindowLevelMenu::windowLevelBone,
           this,
           [this]()
           {
-            // TODO: implement bone window level
+            // Bone: WW=2000, WC=300
+            dynamic_cast<GUICenter*>(m_childWidget)->setWindowLevel(2000, 300);
           });
   connect(m_windowLevelMenu,
           &WindowLevelMenu::fitToWindow,
