@@ -52,6 +52,17 @@ void VtkAdaptRenderer::render(const IFrameCache::FramePtr& frame,
       frame);
 }
 
+void VtkAdaptRenderer::updateWindowLevel(double windowWidth,
+                                         double windowCenter)
+{
+  if (!imageProperty || !m_renderWindow) {
+    return;
+  }
+  imageProperty->SetColorWindow(windowWidth);
+  imageProperty->SetColorLevel(windowCenter);
+  m_renderWindow->Render();
+}
+
 void VtkAdaptRenderer::reset() {}
 
 void VtkAdaptRenderer::fitToWindow()

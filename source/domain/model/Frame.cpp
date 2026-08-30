@@ -1,7 +1,20 @@
 
 #include "Frame.h"
 
-Frame::Frame() {}
+Frame::Frame()
+    : rows(0)
+    , cols(0)
+    , pixelSpacingX(0.0)
+    , pixelSpacingY(0.0)
+    , imagePositionPatient {0.0, 0.0, 0.0}
+    , imageOrientationPatient {0.0, 0.0, 0.0, 0.0, 0.0, 0.0}
+    , frameIndex(0)
+    , slope(1.0)
+    , intercept(0.0)
+    , windowWidth(0.0)
+    , windowCenter(0.0)
+{
+}
 
 // --- Frame Getters & Setters (auto-generated) ---
 const std::vector<uint16_t>& Frame::getPixels() const
@@ -117,4 +130,25 @@ double Frame::getIntercept() const
 void Frame::setIntercept(double intercept)
 {
   this->intercept = intercept;
+}
+
+// --- Frame Getters & Setters (auto-generated) ---
+double Frame::getWindowWidth() const
+{
+  return windowWidth;
+}
+
+void Frame::setWindowWidth(double windowWidth)
+{
+  this->windowWidth = windowWidth;
+}
+
+double Frame::getWindowCenter() const
+{
+  return windowCenter;
+}
+
+void Frame::setWindowCenter(double windowCenter)
+{
+  this->windowCenter = windowCenter;
 }

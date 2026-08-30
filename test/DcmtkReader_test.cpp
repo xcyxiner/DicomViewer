@@ -1,6 +1,8 @@
 #include "infrastructure/dicom_io/DcmtkReader.h"
 
 #include <gtest/gtest.h>
+#include <vtkDoubleArray.h>
+#include <vtkFieldData.h>
 #include <vtkImageData.h>
 #include <vtkSmartPointer.h>
 
@@ -11,6 +13,7 @@
 #include "infrastructure/rendering/VtkAdaptRenderer.h"
 #include "infrastructure/utils/ImageDataComparator.h"
 std::string single_dicom = "res/CT_small.dcm";  // 准备一个真实的DICOM文件
+std::string mr_dicom = "res/MR_small.dcm";  // 包含窗宽窗位的DICOM文件
 std::string multiframe_dicom =
     "res/enhanced_sample.dcm";  // 准备一个多帧的DICOM文件
 
@@ -27,6 +30,18 @@ TEST(DcmtkReaderTest, readFrameInfo)
   EXPECT_NO_THROW(reader.readFrameInfo(0));  // 确保不会抛出异常
   auto frameInfo = reader.readFrameInfo(0);
   EXPECT_NE(frameInfo, nullptr);  // 确保返回的frameInfo不为空
+}
+
+TEST(DcmtkReaderTest, readWindowWidthCenter)
+{
+  DcmtkReader reader;
+  reader.open(mr_dicom);
+  auto frameInfo = reader.readFrameInfo(0);
+  ASSERT_NE(frameInfo, nullptr);
+  double ww = frameInfo->getWindowWidth();
+  double wc = frameInfo->getWindowCenter();
+  EXPECT_GT(ww, 0.0) << "DcmtkReader: WindowWidth should be positive";
+  EXPECT_NE(wc, 0.0) << "DcmtkReader: WindowCenter should be non-zero";
 }
 
 TEST(GdcmReaderTest, OpenValidFile)
@@ -81,6 +96,65 @@ TEST(HybridReaderTest, readFrame)
         }
       },
       frame);
+}
+
+TEST(VTKDicomAdaptReaderTest, readWindowWidthCenter)
+{
+  VTKDicomAdaptReader vtkReader;
+  vtkReader.open(mr_dicom);
+  auto vtkFrame = vtkReader.readFrame(0);
+  ASSERT_EQ(std::get_if<std::nullptr_t>(&vtkFrame), nullptr)
+      << "VTKDicomAdaptReader returned nullptr";
+
+  auto imageData = std::get<vtkSmartPointer<vtkImageData>>(vtkFrame);
+  ASSERT_NE(imageData, nullptr);
+
+  vtkDoubleArray* wcArray = vtkDoubleArray::SafeDownCast(
+      imageData->GetFieldData()->GetAbstractArray("WindowCenter"));
+  vtkDoubleArray* wwArray = vtkDoubleArray::SafeDownCast(
+      imageData->GetFieldData()->GetAbstractArray("WindowWidth"));
+  ASSERT_NE(wcArray, nullptr) << "WindowCenter array missing from FieldData";
+  ASSERT_NE(wwArray, nullptr) << "WindowWidth array missing from FieldData";
+  EXPECT_GT(wwArray->GetValue(0), 0.0)
+      << "VTKDicomAdaptReader: WindowWidth should be positive";
+  EXPECT_NE(wcArray->GetValue(0), 0.0)
+      << "VTKDicomAdaptReader: WindowCenter should be non-zero";
+}
+
+TEST(WindowWidthCenterConsistencyTest, DcmtkVsVTK)
+{
+  // DcmtkReader 读取
+  DcmtkReader dcmtkReader;
+  dcmtkReader.open(mr_dicom);
+  auto frameInfo = dcmtkReader.readFrameInfo(0);
+  ASSERT_NE(frameInfo, nullptr);
+  double dcmtkWW = frameInfo->getWindowWidth();
+  double dcmtkWC = frameInfo->getWindowCenter();
+
+  // VTKDicomAdaptReader 读取
+  VTKDicomAdaptReader vtkReader;
+  vtkReader.open(mr_dicom);
+  auto vtkFrame = vtkReader.readFrame(0);
+  auto imageData = std::get<vtkSmartPointer<vtkImageData>>(vtkFrame);
+  ASSERT_NE(imageData, nullptr);
+
+  vtkDoubleArray* wcArray = vtkDoubleArray::SafeDownCast(
+      imageData->GetFieldData()->GetAbstractArray("WindowCenter"));
+  vtkDoubleArray* wwArray = vtkDoubleArray::SafeDownCast(
+      imageData->GetFieldData()->GetAbstractArray("WindowWidth"));
+  ASSERT_NE(wcArray, nullptr);
+  ASSERT_NE(wwArray, nullptr);
+
+  double vtkWW = wwArray->GetValue(0);
+  double vtkWC = wcArray->GetValue(0);
+
+  // 对比两者结果一致
+  EXPECT_DOUBLE_EQ(dcmtkWW, vtkWW)
+      << "WindowWidth mismatch: DcmtkReader=" << dcmtkWW
+      << " VTKDicomAdaptReader=" << vtkWW;
+  EXPECT_DOUBLE_EQ(dcmtkWC, vtkWC)
+      << "WindowCenter mismatch: DcmtkReader=" << dcmtkWC
+      << " VTKDicomAdaptReader=" << vtkWC;
 }
 
 TEST(VtkAdaptRendererTest, convertFrameToImageData)

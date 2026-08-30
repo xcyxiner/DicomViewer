@@ -44,6 +44,8 @@ IFrameCache::FramePtr HybridReader::readFrame(int index)
           arg->setFrameIndex(frameInfo->getFrameIndex());
           arg->setSlope(frameInfo->getSlope());
           arg->setIntercept(frameInfo->getIntercept());
+          arg->setWindowWidth(frameInfo->getWindowWidth());
+          arg->setWindowCenter(frameInfo->getWindowCenter());
         }
       },
       frameData);

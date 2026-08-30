@@ -25,6 +25,8 @@ private:
    int frameIndex;  // 多帧中的编号
    double slope;
    double intercept;
+   double windowWidth;
+   double windowCenter;
 
 
 public:
@@ -58,4 +60,9 @@ public:
   const std::string& getSopInstanceUid() const;
   void setSopInstanceUid(const std::string& sopInstanceUid);
 
+  double getWindowWidth() const;
+  void setWindowWidth(double windowWidth);
+
+  double getWindowCenter() const;
+  void setWindowCenter(double windowCenter);
 };

@@ -2,6 +2,7 @@
 
 #include "LoadSeriesUseCase.h"
 
+#include <vtkDoubleArray.h>
 #include <vtkFieldData.h>
 #include <vtkImageData.h>
 #include <vtkStringArray.h>
@@ -24,6 +25,8 @@ LoadSeriesUseCase::loadSeriesAsync(const std::string& path)
         m_dicomReader.open(path);
         std::vector<std::string> frameUids;
         auto frame = m_dicomReader.readFrame(0);
+        double windowWidth = 0.0;
+        double windowCenter = 0.0;
         std::visit(
             [&](auto&& frameVariant)
             {
@@ -34,6 +37,8 @@ LoadSeriesUseCase::loadSeriesAsync(const std::string& path)
                 if (frameVariant) {
                   sopUid = frameVariant->getSopInstanceUid();
                   frameIndex = frameVariant->getFrameIndex();
+                  windowWidth = frameVariant->getWindowWidth();
+                  windowCenter = frameVariant->getWindowCenter();
                 }
               }
               if constexpr (std::is_same_v<T, vtkSmartPointer<vtkImageData>>) {
@@ -43,6 +48,18 @@ LoadSeriesUseCase::loadSeriesAsync(const std::string& path)
                           "SOPInstanceUIDs"));
                   if (uidArray && uidArray->GetNumberOfValues() > 0) {
                     sopUid = uidArray->GetValue(0);
+                  }
+                  vtkDoubleArray* wcArray = vtkDoubleArray::SafeDownCast(
+                      frameVariant->GetFieldData()->GetAbstractArray(
+                          "WindowCenter"));
+                  vtkDoubleArray* wwArray = vtkDoubleArray::SafeDownCast(
+                      frameVariant->GetFieldData()->GetAbstractArray(
+                          "WindowWidth"));
+                  if (wcArray && wcArray->GetNumberOfValues() > 0) {
+                    windowCenter = wcArray->GetValue(0);
+                  }
+                  if (wwArray && wwArray->GetNumberOfValues() > 0) {
+                    windowWidth = wwArray->GetValue(0);
                   }
                 }
               }
@@ -55,6 +72,12 @@ LoadSeriesUseCase::loadSeriesAsync(const std::string& path)
         auto displaySet = std::make_shared<StackDisplaySet>();
         displaySet->setFrameUids(frameUids);
         displaySet->setCurrentIndex(0);
+        if (windowWidth > 0.0 && windowCenter != 0.0) {
+          DisplaySettings settings;
+          settings.setWindowWidth(windowWidth);
+          settings.setWindowCenter(windowCenter);
+          displaySet->setDisplaySettings(settings);
+        }
         return displaySet;
       });
 }

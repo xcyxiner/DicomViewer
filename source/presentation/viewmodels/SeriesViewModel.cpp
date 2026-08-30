@@ -68,3 +68,23 @@ void SeriesViewModel::loadSeries(const std::string& path)
             Qt::QueuedConnection);
       });
 }
+
+void SeriesViewModel::resetWindowLevel()
+{
+  if (!m_stackDisplaySet || m_stackDisplaySet->getFrameUids().empty()) {
+    return;
+  }
+
+  const auto& settings = m_stackDisplaySet->getDisplaySettings();
+  m_imageRenderer->updateWindowLevel(settings.getWindowWidth(),
+                                     settings.getWindowCenter());
+}
+
+void SeriesViewModel::setWindowLevel(double windowWidth, double windowCenter)
+{
+  if (!m_stackDisplaySet || m_stackDisplaySet->getFrameUids().empty()) {
+    return;
+  }
+
+  m_imageRenderer->updateWindowLevel(windowWidth, windowCenter);
+}

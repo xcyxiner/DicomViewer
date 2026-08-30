@@ -18,6 +18,7 @@ public:
   void setRenderTarget(vtkSmartPointer<vtkRenderWindow> window) override;  // 设置渲染目标
   void render(const IFrameCache::FramePtr& frame,
               const DisplaySettings& settings) override;
+  void updateWindowLevel(double windowWidth, double windowCenter) override;
   void reset() override;
   void fitToWindow() override;
 
