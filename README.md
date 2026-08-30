@@ -1,6 +1,7 @@
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/github/license/xcyxiner/DicomViewer" alt="License"></a>
   <a href="https://github.com/xcyxiner/DicomViewer/actions"><img src="https://img.shields.io/github/actions/workflow/status/xcyxiner/DicomViewer/ci.yml?style=flat-square" alt="CI"></a>
+   <a href="https://codecov.io/gh/xcyxiner/DicomViewer"><img src="https://img.shields.io/codecov/c/github/xcyxiner/DicomViewer?style=flat-square" alt="Coverage"></a>
   <a href="https://github.com/xcyxiner/DicomViewer/commits/main"><img src="https://img.shields.io/github/last-commit/xcyxiner/DicomViewer?style=flat-square" alt="Last Commit"></a>
   <a href="https://github.com/xcyxiner/DicomViewer/stargazers"><img src="https://img.shields.io/github/stars/xcyxiner/DicomViewer?style=social" alt="Stars"></a>
 </p>
