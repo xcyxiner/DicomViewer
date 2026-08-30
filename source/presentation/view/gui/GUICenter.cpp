@@ -1,5 +1,6 @@
 
 #include <QFileDialog>
+#include <QResizeEvent>
 #include <memory>
 
 #include "GUICenter.h"
@@ -30,7 +31,12 @@ GUICenter::GUICenter(SeriesViewModel* viewModel, QWidget* parent)
   connect(m_seriesViewModel,
           &SeriesViewModel::imageChanged,
           this,
-          [this]() { m_seriesViewModel->render(); });
+          [this]()
+          {
+            m_hasImage = true;
+            m_seriesViewModel->render();
+            fitToWindow();
+          });
 }
 
 GUICenter::~GUICenter() {}
@@ -44,7 +50,28 @@ void GUICenter::onOpenFile()
   }
 }
 
+void GUICenter::onOpenFolder()
+{
+  QString dir = QFileDialog::getExistingDirectory(this, "选择文件夹");
+  if (!dir.isEmpty()) {
+    emit this->addFiles({dir});
+  }
+}
+
 void GUICenter::showEvent()
 {
   m_seriesViewModel->setRenderWindow(m_renderWindow);
+}
+
+void GUICenter::fitToWindow()
+{
+  if (m_hasImage && m_vtkWidget) {
+    m_seriesViewModel->fitToWindow();
+  }
+}
+
+void GUICenter::resizeEvent(QResizeEvent* event)
+{
+  QWidget::resizeEvent(event);
+  fitToWindow();
 }

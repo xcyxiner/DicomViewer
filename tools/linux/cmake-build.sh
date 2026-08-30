@@ -3,4 +3,6 @@
 
 # cmake --preset wsl-debug
 # cmake --build --preset wsl-debug
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT" || exit 1
 cmake --preset wsl-vcpkg-debug -D CMAKE_TOOLCHAIN_FILE="~/vcpkg/scripts/buildsystems/vcpkg.cmake"

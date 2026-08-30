@@ -39,6 +39,11 @@ void SeriesViewModel::render()
   m_imageRenderer->render(frame, m_stackDisplaySet->getDisplaySettings());
 }
 
+void SeriesViewModel::fitToWindow()
+{
+  m_imageRenderer->fitToWindow();
+}
+
 void SeriesViewModel::loadSeries(const std::string& path)
 {
   // 等待上一次加载完成

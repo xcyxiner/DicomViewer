@@ -1,5 +1,6 @@
 #include "VtkAdaptRenderer.h"
 
+#include <vtkCamera.h>
 #include <vtkImageActor.h>
 #include <vtkImageFlip.h>
 #include <vtkImageMapper3D.h>
@@ -10,6 +11,7 @@ VtkAdaptRenderer::VtkAdaptRenderer()
   m_imageActor = vtkSmartPointer<vtkImageActor>::New();
   m_renderer = vtkSmartPointer<vtkRenderer>::New();
   m_renderer->AddActor(m_imageActor);
+  m_renderer->SetBackground(0.0, 0.0, 0.0);  // 黑色背景
   imageProperty = vtkSmartPointer<vtkImageProperty>::New();
   style = vtkSmartPointer<vtkInteractorStyleImage>::New();
   m_imageActor->SetProperty(imageProperty);
@@ -51,6 +53,16 @@ void VtkAdaptRenderer::render(const IFrameCache::FramePtr& frame,
 }
 
 void VtkAdaptRenderer::reset() {}
+
+void VtkAdaptRenderer::fitToWindow()
+{
+  if (!m_renderer || !m_imageActor || !m_imageActor->GetInput()) {
+    return;
+  }
+
+  m_renderer->ResetCamera();
+  m_renderWindow->Render();
+}
 
 vtkSmartPointer<vtkImageData> VtkAdaptRenderer::convertFrameToImageData(
     const std::shared_ptr<Frame>& frame)
