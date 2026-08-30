@@ -1,5 +1,8 @@
 
 
+#include <cmath>
+#include <limits>
+
 #include "LoadSeriesUseCase.h"
 
 #include <vtkDoubleArray.h>
@@ -72,7 +75,9 @@ LoadSeriesUseCase::loadSeriesAsync(const std::string& path)
         auto displaySet = std::make_shared<StackDisplaySet>();
         displaySet->setFrameUids(frameUids);
         displaySet->setCurrentIndex(0);
-        if (windowWidth > 0.0 && windowCenter != 0.0) {
+        if (windowWidth > 0.0
+            && std::abs(windowCenter) > std::numeric_limits<double>::epsilon())
+        {
           DisplaySettings settings;
           settings.setWindowWidth(windowWidth);
           settings.setWindowCenter(windowCenter);
