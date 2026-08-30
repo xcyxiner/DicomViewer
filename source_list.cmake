@@ -52,7 +52,10 @@ set(SRC
     "source/presentation/view/gui/GUICenter.ui"
     "source/presentation/view/gui/GUICenter.h"
     "source/presentation/view/gui/GUICenter.cpp"
+    "source/presentation/view/menu/WindowLevelMenu.ui"
+    "source/presentation/view/menu/WindowLevelMenu.cpp"
     "source/presentation/view/menu/FileMenu.h"
+    "source/presentation/view/menu/WindowLevelMenu.h"
     "source/presentation/view/menu/FileMenu.cpp"
     "source/presentation/view/menu/FileMenu.ui"
 )

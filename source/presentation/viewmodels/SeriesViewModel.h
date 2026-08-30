@@ -26,6 +26,7 @@ public:
     void setRenderWindow(vtkSmartPointer<vtkRenderWindow> window);
     void render();
     void loadSeries(const std::string& path);
+    void fitToWindow();
 
 signals:
     void imageChanged();

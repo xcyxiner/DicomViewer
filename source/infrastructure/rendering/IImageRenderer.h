@@ -14,4 +14,5 @@ public:
     virtual void render(const IFrameCache::FramePtr& frame,
                         const DisplaySettings& settings) = 0;
     virtual void reset() = 0;
+    virtual void fitToWindow() = 0;
 };

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>WindowLevelMenu</class>
+ <widget class="QMenuBar" name="WindowLevelMenu">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>19</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>WindowLevelMenu</string>
+  </property>
+  <widget class="QMenu" name="menuWindowLevel">
+   <property name="title">
+    <string>Window Level</string>
+   </property>
+   <addaction name="actionDefault"/>
+   <addaction name="actionAll"/>
+   <addaction name="separator"/>
+   <addaction name="actionBrain"/>
+   <addaction name="actionLung"/>
+   <addaction name="actionBone"/>
+   <addaction name="separator"/>
+   <addaction name="actionFitToWindow"/>
+  </widget>
+  <action name="actionDefault">
+   <property name="text">
+    <string>Default</string>
+   </property>
+  </action>
+  <action name="actionAll">
+   <property name="text">
+    <string>All</string>
+   </property>
+  </action>
+  <action name="actionBrain">
+   <property name="text">
+    <string>Brain</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+1</string>
+   </property>
+  </action>
+  <action name="actionLung">
+   <property name="text">
+    <string>Lung</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+2</string>
+   </property>
+  </action>
+  <action name="actionBone">
+   <property name="text">
+    <string>Bone</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+3</string>
+   </property>
+  </action>
+  <action name="actionFitToWindow">
+   <property name="text">
+    <string>Fit to Window</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+0</string>
+   </property>
+  </action>
+  <addaction name="menuWindowLevel"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

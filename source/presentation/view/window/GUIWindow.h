@@ -3,6 +3,7 @@
 #include <QMainWindow>
 
 #include "presentation/view/menu/FileMenu.h"
+#include "presentation/view/menu/WindowLevelMenu.h"
 #include "qtmetamacros.h"
 #include "qwidget.h"
 namespace Ui
@@ -20,6 +21,7 @@ public:
 public:
   void setContent(QWidget* t_widget);
   void openFile();
+  void openFolder();
 
   void showEvent(QShowEvent *event) override;
 private:
@@ -29,6 +31,7 @@ private:
   QWidget* m_childWidget = {};
 
   FileMenu* m_fileMenu;
+  WindowLevelMenu* m_windowLevelMenu;
 
   std::unique_ptr<Ui::GUIWindow> ui;
 };

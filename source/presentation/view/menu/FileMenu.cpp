@@ -21,4 +21,7 @@ void FileMenu::createConnections(QWidget* parent) const
 {
   auto* receiver = dynamic_cast<GUIWindow*>(parent);
   connect(ui->actionOpen, &QAction::triggered, receiver, &GUIWindow::openFile);
+  connect(
+      ui->actionOpenFolder, &QAction::triggered, this, &FileMenu::openFolder);
+  connect(ui->actionClose, &QAction::triggered, this, &FileMenu::closeApp);
 }

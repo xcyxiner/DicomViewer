@@ -18,6 +18,9 @@
     <string>File</string>
    </property>
    <addaction name="actionOpen"/>
+   <addaction name="actionOpenFolder"/>
+   <addaction name="separator"/>
+   <addaction name="actionClose"/>
   </widget>
   <action name="actionOpen">
    <property name="text">
@@ -25,6 +28,22 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+F</string>
+   </property>
+  </action>
+  <action name="actionOpenFolder">
+   <property name="text">
+    <string>Open Folder</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
+   </property>
+  </action>
+  <action name="actionClose">
+   <property name="text">
+    <string>Close</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
    </property>
   </action>
   <addaction name="menuFile"/>

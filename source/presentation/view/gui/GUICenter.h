@@ -22,7 +22,12 @@ public:
 
 public:
   void onOpenFile();
+  void onOpenFolder();
   void showEvent();
+  void fitToWindow();
+
+protected:
+  void resizeEvent(QResizeEvent* event) override;
 
 signals:
   void addFiles(const QStringList& t_paths);
@@ -32,4 +37,5 @@ private:
   SeriesViewModel* m_seriesViewModel;
   QVTKOpenGLNativeWidget* m_vtkWidget;
   vtkSmartPointer<vtkGenericOpenGLRenderWindow> m_renderWindow;
+  bool m_hasImage = false;
 };

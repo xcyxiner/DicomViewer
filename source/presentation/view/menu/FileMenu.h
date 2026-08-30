@@ -18,6 +18,8 @@ public:
 
 signals:
   void openFile();
+  void openFolder();
+  void closeApp();
 
 private:
   void createConnections(QWidget* parent) const;

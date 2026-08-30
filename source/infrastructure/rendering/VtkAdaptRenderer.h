@@ -19,6 +19,7 @@ public:
   void render(const IFrameCache::FramePtr& frame,
               const DisplaySettings& settings) override;
   void reset() override;
+  void fitToWindow() override;
 
   vtkSmartPointer<vtkImageData> convertFrameToImageData(
     const std::shared_ptr<Frame>& frame);
