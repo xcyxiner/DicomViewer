@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>LayoutMenu</class>
+ <widget class="QMenuBar" name="LayoutMenu">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>19</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>LayoutMenu</string>
+  </property>
+  <widget class="QMenu" name="menuLayout">
+   <property name="title">
+    <string>Layout</string>
+   </property>
+   <addaction name="actionSingle"/>
+   <addaction name="actionHorizontal"/>
+   <addaction name="actionGrid"/>
+  </widget>
+  <action name="actionSingle">
+   <property name="text">
+    <string>1x1</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionHorizontal">
+   <property name="text">
+    <string>1x2</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionGrid">
+   <property name="text">
+    <string>2x2</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+  </action>
+  <addaction name="menuLayout"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -1,38 +1,34 @@
 
 #pragma once
-#include <QWidget>
 #include <memory>
 
-#include "qtmetamacros.h"
+#include "presentation/view/IViewPanel.h"
 #include "presentation/viewmodels/SeriesViewModel.h"
 #include <QVTKOpenGLNativeWidget.h>
 #include <vtkGenericOpenGLRenderWindow.h>
 #include <vtkSmartPointer.h>
-#include <QVBoxLayout>
+
 namespace Ui {
     class GUICenter;
 }
-class GUICenter : public QWidget
+class GUICenter : public IViewPanel
 {
-  Q_OBJECT
 public:
   explicit GUICenter(SeriesViewModel* viewModel,
                      QWidget* parent = nullptr);
-  ~GUICenter();
+  ~GUICenter() override;
 
-public:
-  void onOpenFile();
-  void onOpenFolder();
-  void showEvent();
-  void fitToWindow();
-  void resetWindowLevel();
-  void setWindowLevel(double windowWidth, double windowCenter);
+  // IViewPanel 接口
+  QString viewName() const override { return "2D Viewer"; }
+  void activate() override;
+  void deactivate() override;
+  void fitToWindow() override;
+  void setWindowLevel(double windowWidth, double windowCenter) override;
+  void resetWindowLevel() override;
+  void loadFiles(const QStringList& paths) override;
 
 protected:
   void resizeEvent(QResizeEvent* event) override;
-
-signals:
-  void addFiles(const QStringList& t_paths);
 
 private:
   Ui::GUICenter* ui;
