@@ -45,7 +45,7 @@ auto main(int argc, char* argv[]) -> int
 
   GUIWindow window;
   GUICenter center(&viewModel);
-  window.setContent(&center);
+  window.registerView(&center);
   window.show();
 
   return application.exec();

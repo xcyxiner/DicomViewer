@@ -138,10 +138,8 @@ if(AUTO_DEPLOY_FONTS AND UNIX)
         file(MAKE_DIRECTORY "${QT_FONT_DEST}")
 
         set(FONT_DIRS
+            "/usr/share/fonts/truetype/droid"
             "/usr/share/fonts/truetype/dejavu"
-            "/usr/share/fonts/truetype/liberation"
-            "/usr/share/fonts/truetype/ubuntu"
-            "/usr/share/fonts/truetype/freefont"
         )
 
         set(FONT_COPIED FALSE)
@@ -154,7 +152,6 @@ if(AUTO_DEPLOY_FONTS AND UNIX)
                 endforeach()
                 message(STATUS "Deployed fonts from ${FONT_DIR} to ${QT_FONT_DEST}")
                 set(FONT_COPIED TRUE)
-                break()
             endif()
         endforeach()
 
