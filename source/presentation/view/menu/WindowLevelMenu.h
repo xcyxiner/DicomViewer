@@ -15,6 +15,7 @@ class WindowLevelMenu : public QMenu
   Q_OBJECT
 public:
   explicit WindowLevelMenu(QMenuBar* menuBar, QWidget* parent = nullptr);
+  ~WindowLevelMenu() override;
 
 signals:
   void windowLevelDefault();

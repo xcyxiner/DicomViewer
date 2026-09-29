@@ -1,10 +1,17 @@
+#include <algorithm>
+#include <cmath>
+
 #include "VtkAdaptRenderer.h"
 
 #include <vtkCamera.h>
+#include <vtkCommand.h>
 #include <vtkImageActor.h>
 #include <vtkImageFlip.h>
 #include <vtkImageMapper3D.h>
 #include <vtkMatrix3x3.h>
+
+#include "infrastructure/utils/FloatCompare.h"
+#include "infrastructure/utils/WindowLevelDrag.h"
 
 VtkAdaptRenderer::VtkAdaptRenderer()
 {
@@ -15,6 +22,15 @@ VtkAdaptRenderer::VtkAdaptRenderer()
   imageProperty = vtkSmartPointer<vtkImageProperty>::New();
   style = vtkSmartPointer<vtkInteractorStyleImage>::New();
   m_imageActor->SetProperty(imageProperty);
+
+  // 窗宽窗位交互回灌（KTD11）：观察者存在时 style 把应用职责交给
+  // 观察者（其 WindowLevel() 的 HasObserver 分支），由本对象计算并
+  // 应用后回灌 ViewModel 统一广播。观察者随 style 成员同生命周期。
+  style->AddObserver(vtkCommand::StartWindowLevelEvent,
+                     this,
+                     &VtkAdaptRenderer::handleStartWindowLevel);
+  style->AddObserver(
+      vtkCommand::WindowLevelEvent, this, &VtkAdaptRenderer::handleWindowLevel);
 }
 
 void VtkAdaptRenderer::setRenderTarget(vtkSmartPointer<vtkRenderWindow> window)
@@ -58,9 +74,76 @@ void VtkAdaptRenderer::updateWindowLevel(double windowWidth,
   if (!imageProperty || !m_renderWindow) {
     return;
   }
+  // 同值早退：拖拽链路（本对象应用 → ViewModel 广播回灌）第二道
+  // 写入值相同，跳过 Set + Render 消除每帧二次重绘（E1）。GL 重建
+  // 后的重绘由调用方显式 render()/fit 保障。
+  if (FloatCompare::nearlyEqual(imageProperty->GetColorWindow(), windowWidth)
+      && FloatCompare::nearlyEqual(imageProperty->GetColorLevel(),
+                                   windowCenter))
+  {
+    return;
+  }
+  // 程序化回写期间抑制交互回灌（KTD11 第一道闸；交互事件不会在本
+  // 调用栈内触发，此标志为纵深防御，第二道闸在 ViewModel 值比较）
+  m_suppressWindowLevelCallback = true;
   imageProperty->SetColorWindow(windowWidth);
   imageProperty->SetColorLevel(windowCenter);
   m_renderWindow->Render();
+  m_suppressWindowLevelCallback = false;
+}
+
+void VtkAdaptRenderer::setWindowLevelCallback(
+    std::function<void(double, double)> callback)
+{
+  // 观察者在构造时已挂接；此处只登记回灌目标（null = 不回灌）
+  m_windowLevelCallback = std::move(callback);
+}
+
+void VtkAdaptRenderer::handleStartWindowLevel(vtkObject*, unsigned long, void*)
+{
+  // KTD11 计算基准：拖拽开始时刻当前 imageProperty 的窗宽窗位
+  if (!imageProperty) {
+    return;
+  }
+  m_initialWindowWidth = imageProperty->GetColorWindow();
+  m_initialWindowCenter = imageProperty->GetColorLevel();
+}
+
+void VtkAdaptRenderer::handleWindowLevel(vtkObject*, unsigned long, void*)
+{
+  if (m_suppressWindowLevelCallback) {
+    // 程序化回写期间的回灌直接丢弃（KTD11 第一道闸）
+    return;
+  }
+  if (!imageProperty || !m_renderWindow) {
+    return;
+  }
+  const int* size = m_renderWindow->GetSize();
+  if (size[0] <= 0 || size[1] <= 0) {
+    return;
+  }
+
+  // 计算公式在 WindowLevelDrag 中单源（复刻 vtkInteractorStyleImage::
+  // WindowLevel，style 在有观察者时不再自行应用，见其源码）。
+  // WindowLevelStartPosition/CurrentPosition 由 style 在按钮按下与
+  // 移动时维护，观察者可公开读取。
+  const int* start = style->GetWindowLevelStartPosition();
+  const int* current = style->GetWindowLevelCurrentPosition();
+  double newWindow = 0.0;
+  double newLevel = 0.0;
+  WindowLevelDrag::compute(start,
+                           current,
+                           size,
+                           m_initialWindowWidth,
+                           m_initialWindowCenter,
+                           newWindow,
+                           newLevel);
+
+  // 应用到 imageProperty 并重绘（程序化路径，抑制标志覆盖）
+  updateWindowLevel(newWindow, newLevel);
+  if (m_windowLevelCallback) {
+    m_windowLevelCallback(newWindow, newLevel);
+  }
 }
 
 void VtkAdaptRenderer::reset() {}

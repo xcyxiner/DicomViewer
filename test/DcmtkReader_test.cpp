@@ -1,3 +1,6 @@
+#include <thread>
+#include <vector>
+
 #include "infrastructure/dicom_io/DcmtkReader.h"
 
 #include <gtest/gtest.h>
@@ -244,6 +247,77 @@ TEST(MemoryFrameCacheTest, PutAndGetFrame)
         }
       },
       retrievedFrame);
+}
+
+namespace
+{
+
+vtkSmartPointer<vtkImageData> makeSmallVolume()
+{
+  auto volume = vtkSmartPointer<vtkImageData>::New();
+  volume->SetDimensions(4, 4, 2);
+  volume->AllocateScalars(VTK_SHORT, 1);
+  return volume;
+}
+
+}  // namespace
+
+// ---- 体槽位 (U2): 单槽语义 + 并发保护 ----
+
+TEST(MemoryFrameCacheTest, PutAndGetVolumeRoundTrip)
+{
+  MemoryFrameCache cache;
+  auto volume = makeSmallVolume();
+  cache.putVolume("series-A", volume);
+  auto retrieved = cache.getVolume("series-A");
+  ASSERT_NE(retrieved, nullptr);
+  // 指针相等：取回同一对象，未复制像素
+  EXPECT_EQ(retrieved.GetPointer(), volume.GetPointer());
+}
+
+TEST(MemoryFrameCacheTest, VolumeSingleSlotReplacement)
+{
+  MemoryFrameCache cache;
+  auto volumeA = makeSmallVolume();
+  auto volumeB = makeSmallVolume();
+  cache.putVolume("series-A", volumeA);
+  cache.putVolume("series-B", volumeB);
+  // 单槽：新体写入后旧体不可再取回
+  EXPECT_EQ(cache.getVolume("series-A"), nullptr);
+  auto retrieved = cache.getVolume("series-B");
+  ASSERT_NE(retrieved, nullptr);
+  EXPECT_EQ(retrieved.GetPointer(), volumeB.GetPointer());
+}
+
+TEST(MemoryFrameCacheTest, GetUnknownVolumeReturnsNull)
+{
+  MemoryFrameCache cache;
+  EXPECT_EQ(cache.getVolume("no-such-series"), nullptr);
+}
+
+TEST(MemoryFrameCacheTest, ConcurrentPutGetSmoke)
+{
+  auto cache = std::make_shared<MemoryFrameCache>();
+  auto volume = makeSmallVolume();
+  constexpr int kRounds = 500;
+  std::vector<std::thread> threads;
+  for (int t = 0; t < 4; ++t) {
+    threads.emplace_back(
+        [cache, volume, t]()
+        {
+          for (int i = 0; i < kRounds; ++i) {
+            auto frame = std::make_shared<Frame>();
+            cache->put("sop-uid", i % 8, frame);
+            cache->putVolume("series-concurrent", volume);
+            (void)cache->get("sop-uid", i % 8);
+            (void)cache->getVolume("series-concurrent");
+          }
+        });
+  }
+  for (auto& thread : threads) {
+    thread.join();
+  }
+  EXPECT_NE(cache->getVolume("series-concurrent"), nullptr);
 }
 
 int main(int argc, char** argv)

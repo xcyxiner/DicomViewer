@@ -28,6 +28,10 @@ public:
   // 更新布局模式选中状态
   void setLayoutMode(LayoutMode mode);
 
+  // 「分配视图」子菜单启禁用 —— 非分屏视图模式下槽位由 ViewMode
+  // 决定，逐格分配无意义（GUIWindow 侧同步忽略越权分配）
+  void setSlotMenusEnabled(bool enabled);
+
 signals:
   void layoutModeChanged(LayoutMode mode);
   void slotViewChanged(int slot, int viewIndex);

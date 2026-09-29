@@ -4,6 +4,14 @@
 #include <QStringList>
 #include <QWidget>
 
+// 面板角色 —— ViewMode 据此决定面板是否参与槽位分配（MprOnly 只给
+// Mpr 角色分配槽位，TwoDOnly 只给 TwoD，Split 全部分配）。
+enum class ViewRole
+{
+  TwoD,
+  Mpr
+};
+
 class IViewPanel : public QWidget
 {
   Q_OBJECT
@@ -16,6 +24,9 @@ public:
 
   // 显示名称（纯虚，每个视图必须实现）
   virtual QString viewName() const = 0;
+
+  // 面板角色（默认 2D；MPR 面板覆写）
+  virtual ViewRole viewRole() const { return ViewRole::TwoD; }
 
   // 生命周期回调
   virtual void activate() {}
