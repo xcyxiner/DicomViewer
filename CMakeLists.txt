@@ -30,6 +30,7 @@ find_package(VTK REQUIRED COMPONENTS
     RenderingCore
     RenderingOpenGL2
     RenderingVolumeOpenGL2
+    RenderingImage
     InteractionStyle
     RenderingQt
 )
@@ -77,6 +78,7 @@ set(COMMON_LIBS
     VTK::RenderingCore
     VTK::RenderingOpenGL2
     VTK::RenderingVolumeOpenGL2
+    VTK::RenderingImage
     VTK::InteractionStyle
     VTK::RenderingQt
     VTK::DICOM

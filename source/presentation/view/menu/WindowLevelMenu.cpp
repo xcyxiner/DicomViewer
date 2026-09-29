@@ -15,6 +15,11 @@ WindowLevelMenu::WindowLevelMenu(QMenuBar* menuBar, QWidget* parent)
   createConnections();
 }
 
+WindowLevelMenu::~WindowLevelMenu()
+{
+  delete ui;
+}
+
 void WindowLevelMenu::createConnections() const
 {
   connect(ui->actionDefault,

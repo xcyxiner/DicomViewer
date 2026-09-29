@@ -7,6 +7,7 @@
 
 #include "presentation/view/menu/FileMenu.h"
 #include "presentation/view/menu/LayoutMenu.h"
+#include "presentation/view/menu/ViewMenu.h"
 #include "presentation/view/menu/WindowLevelMenu.h"
 #include "ui_GUIWindow.h"
 
@@ -96,8 +97,23 @@ void GUIWindow::createMenu()
             }
           });
 
+  // ViewMenu（默认仅 2D：启动只显示 2D，MPR 经菜单切出）
+  this->m_viewMenu = new ViewMenu(this->ui->menubar, this);
+  connect(
+      m_viewMenu, &ViewMenu::viewModeChanged, this, &GUIWindow::setViewMode);
+  connect(this,
+          &GUIWindow::viewModeChanged,
+          this,
+          [this](ViewMode mode)
+          {
+            m_viewMenu->setViewMode(mode);
+            // 非分屏模式下逐格分配无意义，禁用「分配视图」
+            m_layoutMenu->setSlotMenusEnabled(mode == ViewMode::Split);
+          });
+
   // LayoutMenu
   this->m_layoutMenu = new LayoutMenu(this->ui->menubar, this);
+  m_layoutMenu->setSlotMenusEnabled(false);  // 默认仅 2D
   connect(m_layoutMenu,
           &LayoutMenu::layoutModeChanged,
           this,
@@ -127,23 +143,85 @@ void GUIWindow::registerView(IViewPanel* panel)
 {
   m_panels.append(panel);
 
-  // 找到第一个空格子分配
-  for (int i = 0; i < m_slotAssignments.size(); ++i) {
-    if (m_slotAssignments[i] == -1) {
-      m_slotAssignments[i] = m_panels.size() - 1;
-      break;
-    }
-  }
+  // 按当前视图模式解析槽位：默认仅 2D 下 2D 先注册落槽 0，
+  // MPR 随后注册不占槽 —— 启动即只显示 2D
+  m_slotAssignments = resolveSlots(m_slotAssignments, m_viewMode);
 
+  // refreshLayout 会对所有可见面板补调 activate（KTD8），首个面板
+  // 的激活语义由其承担；此处只初始化焦点槽。
   refreshLayout();
 
-  // 第一个注册的视图自动激活
   if (m_panels.size() == 1) {
-    m_panels[0]->activate();
     m_focusedSlot = 0;
   }
 
   emit viewRegistered(panel->viewName());
+}
+
+void GUIWindow::setViewMode(ViewMode mode)
+{
+  if (mode == m_viewMode) {
+    return;
+  }
+  if (m_viewMode == ViewMode::Split) {
+    // 记住分屏指派，回到分屏时恢复
+    m_splitAssignments = m_slotAssignments;
+  }
+  m_viewMode = mode;
+  const QVector<int> base = (mode == ViewMode::Split)
+      ? m_splitAssignments
+      : QVector<int> {-1, -1, -1, -1};
+  m_slotAssignments = resolveSlots(base, mode);
+  if (!findPanelForSlot(m_focusedSlot)) {
+    m_focusedSlot = 0;
+  }
+  refreshLayout();
+  emit viewModeChanged(mode);
+}
+
+bool GUIWindow::isRoleActive(ViewRole role, ViewMode mode) const
+{
+  switch (mode) {
+    case ViewMode::MprOnly:
+      return role == ViewRole::Mpr;
+    case ViewMode::TwoDOnly:
+      return role == ViewRole::TwoD;
+    case ViewMode::Split:
+      return true;
+  }
+  return true;
+}
+
+QVector<int> GUIWindow::resolveSlots(const QVector<int>& base,
+                                     ViewMode mode) const
+{
+  // 注意：局部变量不可叫 slots —— Qt 关键字宏会把它展开为空
+  QVector<int> resolved = base;
+
+  // 模式内活跃但尚未占槽的面板 → 按注册序补进空槽
+  for (int panelIndex = 0; panelIndex < m_panels.size(); ++panelIndex) {
+    if (!isRoleActive(m_panels[panelIndex]->viewRole(), mode)
+        || resolved.contains(panelIndex))
+    {
+      continue;
+    }
+    int freeSlot = resolved.indexOf(-1);
+    if (freeSlot < 0) {
+      break;
+    }
+    resolved[freeSlot] = panelIndex;
+  }
+
+  // 非活跃面板让出槽位（单视图模式下另一视图不显示）
+  for (int slot = 0; slot < resolved.size(); ++slot) {
+    int panelIndex = resolved[slot];
+    if (panelIndex >= 0 && panelIndex < m_panels.size()
+        && !isRoleActive(m_panels[panelIndex]->viewRole(), mode))
+    {
+      resolved[slot] = -1;
+    }
+  }
+  return resolved;
 }
 
 void GUIWindow::setGridLayout(LayoutMode mode)
@@ -155,6 +233,10 @@ void GUIWindow::setGridLayout(LayoutMode mode)
 
 void GUIWindow::assignViewToSlot(int slot, int viewIndex)
 {
+  // 单视图模式下槽位由 ViewMode 决定（分配菜单同步禁用），忽略越权分配
+  if (m_viewMode != ViewMode::Split) {
+    return;
+  }
   if (slot >= 0 && slot < m_slotAssignments.size()) {
     m_slotAssignments[slot] = viewIndex;
     refreshLayout();
@@ -239,6 +321,10 @@ void GUIWindow::refreshLayout()
     if (panel) {
       m_gridLayout->addWidget(panel, row, col);
       panel->show();
+      // KTD8：布局切换会重挂 widget 触发 GL 上下文重建，对可见面板
+      // 补调 activate（幂等：注入渲染目标并补推缓存状态），消除
+      // "注册后未激活"的面板生命周期缺口。
+      panel->activate();
       panel->fitToWindow();
     } else {
       m_gridLayout->addWidget(createPlaceholder(), row, col);
@@ -265,14 +351,7 @@ void GUIWindow::openFile()
   QFileDialog fileDialog(this, "选择文件");
   fileDialog.setFileMode(QFileDialog::ExistingFile);
   if (fileDialog.exec() == QDialog::Accepted) {
-    QStringList paths = fileDialog.selectedFiles();
-    // 传递给所有活动视图
-    for (int i = 0; i < slotCount(); ++i) {
-      IViewPanel* panel = findPanelForSlot(i);
-      if (panel) {
-        panel->loadFiles(paths);
-      }
-    }
+    broadcastLoadFiles(fileDialog.selectedFiles());
   }
 }
 
@@ -280,12 +359,15 @@ void GUIWindow::openFolder()
 {
   QString dir = QFileDialog::getExistingDirectory(this, "选择文件夹");
   if (!dir.isEmpty()) {
-    QStringList paths = {dir};
-    for (int i = 0; i < slotCount(); ++i) {
-      IViewPanel* panel = findPanelForSlot(i);
-      if (panel) {
-        panel->loadFiles(paths);
-      }
+    broadcastLoadFiles({dir});
+  }
+}
+
+void GUIWindow::broadcastLoadFiles(const QStringList& paths)
+{
+  for (IViewPanel* panel : m_panels) {
+    if (panel) {
+      panel->loadFiles(paths);
     }
   }
 }

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ViewMenu</class>
+ <widget class="QMenuBar" name="ViewMenu">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>19</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>ViewMenu</string>
+  </property>
+  <widget class="QMenu" name="menuView">
+   <property name="title">
+    <string>View</string>
+   </property>
+   <addaction name="actionMprOnly"/>
+   <addaction name="actionTwoDOnly"/>
+   <addaction name="actionSplit"/>
+  </widget>
+  <action name="actionMprOnly">
+   <property name="text">
+    <string>仅 MPR</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionTwoDOnly">
+   <property name="text">
+    <string>仅 2D</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionSplit">
+   <property name="text">
+    <string>2D + MPR 分屏</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+  </action>
+  <addaction name="menuView"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -4,3 +4,5 @@ check-filenames =
 check-hidden =
 skip = vcpkg_installed,third_party,*/.git,*/build,*/prefix
 quiet-level = 2
+# 测试辅助函数名 waitFor（camelCase）被误判为 "wait for"
+ignore-words-list = waitFor

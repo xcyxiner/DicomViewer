@@ -1,7 +1,10 @@
 
 #include "StackDisplaySet.h"
 
-StackDisplaySet::StackDisplaySet() {}
+StackDisplaySet::StackDisplaySet()
+    : currentIndex(0)
+{
+}
 
 // --- StackDisplaySet Getters & Setters (auto-generated) ---
 const DisplaySettings& StackDisplaySet::getDisplaySettings() const
@@ -34,4 +37,15 @@ int StackDisplaySet::getCurrentIndex() const
 void StackDisplaySet::setCurrentIndex(int currentIndex)
 {
   this->currentIndex = currentIndex;
+}
+
+// --- 序列缓存键 (U3: 体槽位取体入口的 key) ---
+const std::string& StackDisplaySet::getSeriesKey() const
+{
+  return seriesKey;
+}
+
+void StackDisplaySet::setSeriesKey(const std::string& seriesKey)
+{
+  this->seriesKey = seriesKey;
 }

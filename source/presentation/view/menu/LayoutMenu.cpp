@@ -64,6 +64,11 @@ void LayoutMenu::setLayoutMode(LayoutMode mode)
   }
 }
 
+void LayoutMenu::setSlotMenusEnabled(bool enabled)
+{
+  m_slotMenu->setEnabled(enabled);
+}
+
 void LayoutMenu::updateSlotMenus(const QVector<IViewPanel*>& panels,
                                  int slotCount)
 {

@@ -1,5 +1,17 @@
 # CLAUDE.md — DicomViewer 项目指南
 
+## 全局规则
+
+### 技能 (Skill) 使用限制
+
+- 仅允许直接使用以下技能，无需询问:
+  - `ce-work`
+  - `ce-brainstorm`
+  - `ce-plan`
+  - `ce-compound`
+- 使用其他任何技能 (包括内置技能、compound-engineering 的其他技能) 前，
+  必须先向用户询问并获得同意。
+
 ## 项目概述
 
 DICOM 医学影像查看器，支持 2D 图像浏览、MPR 多平面重建、3D 可视化。
@@ -107,6 +119,12 @@ using FramePtr = std::variant<
 - 2 空格缩进
 - 类/函数/枚举使用 Allman 风格大括号 (左括号换行)
 - #include 按组重排
+
+### 工作区 WIP 规则
+
+- 用户预先存在的未提交改动 (工作区脏文件) 一律不提交、不推送——用户要亲自审查。
+- 实现可以在这些文件之上继续编辑 ("只在现有基础上改")，但 git 提交必须按路径排除它们。
+- 暂存时禁止 `git add .` / `git add -A`；提交前用 `git status --short` 核对暂存内容。
 
 ### 编码要求
 

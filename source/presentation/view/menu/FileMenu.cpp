@@ -17,6 +17,11 @@ FileMenu::FileMenu(QMenuBar* menuBar, QWidget* parent)
   createConnections(parent);
 }
 
+FileMenu::~FileMenu()
+{
+  delete ui;
+}
+
 void FileMenu::createConnections(QWidget* parent) const
 {
   auto* receiver = dynamic_cast<GUIWindow*>(parent);

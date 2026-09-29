@@ -15,6 +15,7 @@ class FileMenu : public QMenu
   Q_OBJECT
 public:
   explicit FileMenu(QMenuBar* menuBar, QWidget* parent = nullptr);
+  ~FileMenu() override;
 
 signals:
   void openFile();
