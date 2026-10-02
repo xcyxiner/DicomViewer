@@ -48,6 +48,12 @@ gtest_discover_tests(LoadSeriesUseCase_test)
 add_executable(SeriesViewModel_test
     SeriesViewModel_test.cpp
 )
+# 发现阶段 (gtest_discover_tests) 在 POST_BUILD 就要启动 exe 构造
+# QApplication，须先把 Qt 插件拷到 exe 同级（POST_BUILD 按添加序执行，
+# 部署必须先于 gtest_discover_tests 注册）
+if(COMMAND _deploy_qt_plugins)
+    _deploy_qt_plugins(SeriesViewModel_test)
+endif()
 target_link_libraries(SeriesViewModel_test PRIVATE
     GTest::gtest_main
     dicom_core
@@ -61,6 +67,9 @@ gtest_discover_tests(SeriesViewModel_test)
 add_executable(MprPanel_test
     MprPanel_test.cpp
 )
+if(COMMAND _deploy_qt_plugins)
+    _deploy_qt_plugins(MprPanel_test)
+endif()
 target_link_libraries(MprPanel_test PRIVATE
     GTest::gtest_main
     dicom_core
@@ -74,6 +83,9 @@ gtest_discover_tests(MprPanel_test
 add_executable(ViewMode_test
     ViewMode_test.cpp
 )
+if(COMMAND _deploy_qt_plugins)
+    _deploy_qt_plugins(ViewMode_test)
+endif()
 target_link_libraries(ViewMode_test PRIVATE
     GTest::gtest_main
     dicom_core
