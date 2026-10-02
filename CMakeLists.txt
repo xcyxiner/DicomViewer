@@ -104,27 +104,29 @@ if(UNIX)
 endif()
 
 # ---- Windows: 自动部署 Qt 插件 ----
-option(DEPLOY_QT_PLUGINS "Auto-copy Qt platform plugins after build" OFF)
+# 用整目录拷贝代替逐个 DLL 点名：platforms 里的 offscreen/minimal 等
+# 无头插件是测试 (gtest_discover_tests) 在构建期就要加载的，漏拷会导致
+# 发现阶段超时；imageformats/styles/generic 供运行时按需加载。
+option(DEPLOY_QT_PLUGINS "Auto-copy Qt plugins after build" OFF)
 if(WIN32 AND MSVC AND DEPLOY_QT_PLUGINS)
-    set(_triplet "${VCPKG_TARGET_TRIPLET}")
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-        set(_qt_plugins "${CMAKE_BINARY_DIR}/vcpkg_installed/${_triplet}/debug/Qt6/plugins")
-        set(_plugin_suffix "d")
-        set(_config_name "Debug")
-    else()
-        set(_qt_plugins "${CMAKE_BINARY_DIR}/vcpkg_installed/${_triplet}/Qt6/plugins")
-        set(_plugin_suffix "")
-        set(_config_name "Release")
-    endif()
+    set(_qt_vcpkg_root
+        "${CMAKE_BINARY_DIR}/vcpkg_installed/${VCPKG_TARGET_TRIPLET}")
+    # Debug 走 debug 树（DLL 带 d 后缀），其余配置走 release 树
+    set(_qt_plugin_tree
+        "$<IF:$<CONFIG:Debug>,debug/,>")
 
-    add_custom_command(TARGET DicomViewer_exe POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory
-            $<TARGET_FILE_DIR:DicomViewer_exe>/platforms
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${_qt_plugins}/platforms/qwindows${_plugin_suffix}.dll"
-            $<TARGET_FILE_DIR:DicomViewer_exe>/platforms/qwindows${_plugin_suffix}.dll
-        COMMENT "Copying qwindows${_plugin_suffix}.dll (${_config_name})"
-    )
+    function(_deploy_qt_plugins target)
+        foreach(_plugin_cat platforms imageformats styles generic)
+            add_custom_command(TARGET ${target} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_directory
+                    "${_qt_vcpkg_root}/${_qt_plugin_tree}Qt6/plugins/${_plugin_cat}"
+                    "$<TARGET_FILE_DIR:${target}>/${_plugin_cat}"
+                COMMENT "Deploying Qt ${_plugin_cat} plugins ($<CONFIG>)"
+            )
+        endforeach()
+    endfunction()
+
+    _deploy_qt_plugins(DicomViewer_exe)
 endif()
 
 # ---- Linux: 自动部署 Qt 字体 ----

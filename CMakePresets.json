@@ -6,33 +6,9 @@
     "patch": 0
   },
   "buildPresets": [
-    {
-      "name": "wsl-debug",
-      "configurePreset": "wsl-debug",
-      "jobs": 10
-    }
   ],
   "configurePresets": [
      {
-      "name": "wsl-debug",
-      "displayName": "WSL Debug",
-      "description": "Debug build on WSL (x64-linux)",
-      "binaryDir": "${sourceDir}/build",
-      "generator": "Ninja",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_CXX_FLAGS": "",
-        "CMAKE_PREFIX_PATH": "${sourceDir}/build/vcpkg_installed/x64-linux/debug;${sourceDir}/build/vcpkg_installed/x64-linux",
-        "AUTO_DEPLOY_FONTS": "ON",
-        "AUTO_TESTING": "ON"
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Linux"
-      }
-    },
-    {
       "name": "wsl-vcpkg-debug",
       "displayName": "WSL vcpkg",
       "description": "Debug build on WSL (x64-linux)",
@@ -50,6 +26,30 @@
         "type": "equals",
         "lhs": "${hostSystemName}",
         "rhs": "Linux"
+      }
+    },
+      {
+      "name": "win-vcpkg-debug",
+      "displayName": "Windows vcpkg",
+      "description": "Debug build on Windows (x64-windows)",
+      "binaryDir": "${sourceDir}/build",
+      "generator": "",
+      "toolchainFile": "D:/vcpkg/scripts/buildsystems/vcpkg.cmake",
+      "environment": {
+        "VCPKG_ROOT": "D:/vcpkg"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CXX_FLAGS": "",
+        "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/triplets",
+        "VCPKG_TARGET_TRIPLET": "x64-windows",
+        "AUTO_TESTING": "ON",
+        "DEPLOY_QT_PLUGINS": "ON"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
       }
     },
     {
