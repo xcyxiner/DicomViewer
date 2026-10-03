@@ -288,13 +288,19 @@ IViewPanel* GUIWindow::findPanelForSlot(int slot) const
 
 void GUIWindow::refreshLayout()
 {
-  // 清空网格中的所有控件（不删除）
+  // 摘除上一轮全部格子控件但不改父子关系：setParent(nullptr) 会把
+  // QVTKOpenGLNativeWidget 摘成顶层窗口，GL 上下文随原生窗口销毁，
+  // 下一轮 addWidget 重挂时上下文重建——VTK 清理旧 FBO 报
+  // "glDeleteFramebuffers Invalid operation"（每格一组 16 条）。
+  // takeAt 后面板仍是 centralwidget 的子控件、仅脱离布局管理；占位
+  // 格是每轮新建的临时对象，摘下即删（原先遗弃到无父状态会泄漏）。
   while (m_gridLayout->count() > 0) {
     QLayoutItem* item = m_gridLayout->takeAt(0);
-    if (item->widget()) {
-      item->widget()->setParent(nullptr);
-    }
+    QWidget* widget = item->widget();
     delete item;
+    if (widget && !qobject_cast<IViewPanel*>(widget)) {
+      delete widget;
+    }
   }
 
   int cols, rows;
@@ -311,6 +317,19 @@ void GUIWindow::refreshLayout()
       rows = 2;
       cols = 2;
       break;
+  }
+
+  // 本轮不占槽的面板显式隐藏——原实现靠 setParent(nullptr) 的附带
+  // 隐藏表达"离槽"，保住父子关系后须手动表达；含已指派但超出本轮
+  // 格数的槽位（如 Split 指派 4 槽 + Single 布局只渲染槽 0）。
+  for (IViewPanel* panel : m_panels) {
+    bool placed = false;
+    for (int slot = 0; slot < rows * cols && !placed; ++slot) {
+      placed = (findPanelForSlot(slot) == panel);
+    }
+    if (!placed) {
+      panel->hide();
+    }
   }
 
   for (int slot = 0; slot < rows * cols; ++slot) {
