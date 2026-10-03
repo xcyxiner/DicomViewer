@@ -17,7 +17,10 @@ VtkAdaptRenderer::VtkAdaptRenderer()
 {
   m_imageActor = vtkSmartPointer<vtkImageActor>::New();
   m_renderer = vtkSmartPointer<vtkRenderer>::New();
-  m_renderer->AddActor(m_imageActor);
+  // 不在此处 AddActor：imageActor 的 mapper（ImageSliceMapper）输入口
+  // 非可选，未 SetInputData 就进管线会在窗口首绘（Qt show/resize 触发
+  // Render）时报 "Input port 0 ... has 0 connections" 错误框。改为
+  // render() 注入像素后惰性挂载（幂等 HasViewProp 判断）。
   m_renderer->SetBackground(0.0, 0.0, 0.0);  // 黑色背景
   imageProperty = vtkSmartPointer<vtkImageProperty>::New();
   style = vtkSmartPointer<vtkInteractorStyleImage>::New();
@@ -58,6 +61,11 @@ void VtkAdaptRenderer::render(const IFrameCache::FramePtr& frame,
           return;
         }
         m_imageActor->GetMapper()->SetInputData(imageData);
+        if (!m_renderer->HasViewProp(m_imageActor)) {
+          // 首帧数据就绪后才挂进场景（见构造函数注释：早挂会触发
+          // 空输入管线错误）。HasViewProp 判断使重复 render 幂等。
+          m_renderer->AddActor(m_imageActor);
+        }
         imageProperty->SetColorWindow(settings.getWindowWidth());
         imageProperty->SetColorLevel(settings.getWindowCenter());
         interactor = m_renderWindow->GetInteractor();
