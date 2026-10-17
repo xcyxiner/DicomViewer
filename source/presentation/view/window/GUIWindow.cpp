@@ -107,8 +107,9 @@ void GUIWindow::createMenu()
           [this](ViewMode mode)
           {
             m_viewMenu->setViewMode(mode);
-            // 非分屏模式下逐格分配无意义，禁用「分配视图」
-            m_layoutMenu->setSlotMenusEnabled(mode == ViewMode::Split);
+            // 槽位在两种模式下均由 ViewMode 固定（见 assignViewToSlot），
+            // 「分配视图」恒禁用
+            m_layoutMenu->setSlotMenusEnabled(false);
           });
 
   // LayoutMenu
@@ -144,7 +145,7 @@ void GUIWindow::registerView(IViewPanel* panel)
   m_panels.append(panel);
 
   // 按当前视图模式解析槽位：默认仅 2D 下 2D 先注册落槽 0，
-  // MPR 随后注册不占槽 —— 启动即只显示 2D
+  // MPR/3D 随后注册不占槽 —— 启动即只显示 2D
   m_slotAssignments = resolveSlots(m_slotAssignments, m_viewMode);
 
   // refreshLayout 会对所有可见面板补调 activate（KTD8），首个面板
@@ -163,31 +164,33 @@ void GUIWindow::setViewMode(ViewMode mode)
   if (mode == m_viewMode) {
     return;
   }
-  if (m_viewMode == ViewMode::Split) {
-    // 记住分屏指派，回到分屏时恢复
-    m_splitAssignments = m_slotAssignments;
-  }
   m_viewMode = mode;
-  const QVector<int> base = (mode == ViewMode::Split)
-      ? m_splitAssignments
-      : QVector<int> {-1, -1, -1, -1};
-  m_slotAssignments = resolveSlots(base, mode);
+  // 槽位从空表重解：模式内活跃面板按注册序补槽，非活跃面板让位
+  // （TwoDOnly → 槽0=2D；Mpr3d → 槽0-3 = 轴/冠/矢/3D）
+  m_slotAssignments = resolveSlots({-1, -1, -1, -1}, mode);
   if (!findPanelForSlot(m_focusedSlot)) {
     m_focusedSlot = 0;
   }
-  refreshLayout();
+  // 布局联动：进 MPR+3D 强制 2x2 四格，回仅 2D 强制 1x1
+  // （否则其余格子是「无视图」占位）。setGridLayout 内含
+  // refreshLayout + emit；布局恰好相同时仍需重排槽位。
+  const LayoutMode want =
+      (mode == ViewMode::Mpr3d) ? LayoutMode::Grid : LayoutMode::Single;
+  if (m_layoutMode != want) {
+    setGridLayout(want);
+  } else {
+    refreshLayout();
+  }
   emit viewModeChanged(mode);
 }
 
 bool GUIWindow::isRoleActive(ViewRole role, ViewMode mode) const
 {
   switch (mode) {
-    case ViewMode::MprOnly:
-      return role == ViewRole::Mpr;
     case ViewMode::TwoDOnly:
       return role == ViewRole::TwoD;
-    case ViewMode::Split:
-      return true;
+    case ViewMode::Mpr3d:
+      return role == ViewRole::Mpr || role == ViewRole::Volume;
   }
   return true;
 }
@@ -233,14 +236,10 @@ void GUIWindow::setGridLayout(LayoutMode mode)
 
 void GUIWindow::assignViewToSlot(int slot, int viewIndex)
 {
-  // 单视图模式下槽位由 ViewMode 决定（分配菜单同步禁用），忽略越权分配
-  if (m_viewMode != ViewMode::Split) {
-    return;
-  }
-  if (slot >= 0 && slot < m_slotAssignments.size()) {
-    m_slotAssignments[slot] = viewIndex;
-    refreshLayout();
-  }
+  // 两种视图模式下槽位均由 ViewMode 决定（分配菜单同步恒禁用），
+  // 忽略一切越权分配（保留接口与信号链，改动面最小）
+  Q_UNUSED(slot)
+  Q_UNUSED(viewIndex)
 }
 
 void GUIWindow::setFocusedSlot(int slot)

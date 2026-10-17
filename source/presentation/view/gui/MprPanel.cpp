@@ -5,21 +5,10 @@
 
 #include "MprPanel.h"
 
+#include "infrastructure/rendering/VolumeUsability.h"
+
 namespace
 {
-
-// MPR 可用性：体在 z 向至少 2 层才是真正的三维体。单层体（N=1 的
-// 单文件序列）轴位尚可，但冠/矢面退化为 1 像素条，无诊断意义——
-// 此时进占位比进三联更诚实。多帧单文件（enhanced）z 深度 >1 不受影响。
-bool isMprUsable(const vtkSmartPointer<vtkImageData>& volume)
-{
-  if (!volume) {
-    return false;
-  }
-  int extent[6];
-  volume->GetExtent(extent);
-  return extent[5] > extent[4];
-}
 
 // 平面编号 → 面板显示名（分配视图菜单据此逐格列出，须互不相同）
 QString nameForPlane(int plane)
@@ -146,7 +135,7 @@ void MprPanel::onSeriesLoaded()
 void MprPanel::applyVolume()
 {
   auto volume = m_viewModel->getVolume();
-  const bool usable = isMprUsable(volume);
+  const bool usable = isVolumeUsable(volume);
   if (usable) {
     m_cachedVolume = volume;
     m_renderer->setVolume(volume);

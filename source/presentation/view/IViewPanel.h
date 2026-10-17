@@ -4,12 +4,13 @@
 #include <QStringList>
 #include <QWidget>
 
-// 面板角色 —— ViewMode 据此决定面板是否参与槽位分配（MprOnly 只给
-// Mpr 角色分配槽位，TwoDOnly 只给 TwoD，Split 全部分配）。
+// 面板角色 —— ViewMode 据此决定面板是否参与槽位分配：
+// TwoDOnly 只给 TwoD 分配槽位；Mpr3d 给 Mpr + Volume 分配（2D 让位）。
 enum class ViewRole
 {
   TwoD,
-  Mpr
+  Mpr,
+  Volume  // 3D 体绘制面板
 };
 
 class IViewPanel : public QWidget

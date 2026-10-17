@@ -16,9 +16,8 @@ ViewMenu::ViewMenu(QMenuBar* menuBar, QWidget* parent)
   // 视图模式单选组
   m_modeGroup = new QActionGroup(this);
   m_modeGroup->setExclusive(true);
-  m_modeGroup->addAction(ui->actionMprOnly);
   m_modeGroup->addAction(ui->actionTwoDOnly);
-  m_modeGroup->addAction(ui->actionSplit);
+  m_modeGroup->addAction(ui->actionMpr3d);
   ui->actionTwoDOnly->setChecked(true);  // 默认：仅 2D
 
   createConnections();
@@ -31,31 +30,24 @@ ViewMenu::~ViewMenu()
 
 void ViewMenu::createConnections()
 {
-  connect(ui->actionMprOnly,
-          &QAction::triggered,
-          this,
-          [this]() { emit viewModeChanged(ViewMode::MprOnly); });
   connect(ui->actionTwoDOnly,
           &QAction::triggered,
           this,
           [this]() { emit viewModeChanged(ViewMode::TwoDOnly); });
-  connect(ui->actionSplit,
+  connect(ui->actionMpr3d,
           &QAction::triggered,
           this,
-          [this]() { emit viewModeChanged(ViewMode::Split); });
+          [this]() { emit viewModeChanged(ViewMode::Mpr3d); });
 }
 
 void ViewMenu::setViewMode(ViewMode mode)
 {
   switch (mode) {
-    case ViewMode::MprOnly:
-      ui->actionMprOnly->setChecked(true);
-      break;
     case ViewMode::TwoDOnly:
       ui->actionTwoDOnly->setChecked(true);
       break;
-    case ViewMode::Split:
-      ui->actionSplit->setChecked(true);
+    case ViewMode::Mpr3d:
+      ui->actionMpr3d->setChecked(true);
       break;
   }
 }

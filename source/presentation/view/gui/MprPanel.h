@@ -54,7 +54,7 @@ private:
   // 激活后经取体入口按 seriesKey 取体（view 不直读 IFrameCache）
   // → applyVolume。
   void onSeriesLoaded();
-  // 取体 + isMprUsable 门控 + 推送/占位的共用主体（onSeriesLoaded
+  // 取体 + isVolumeUsable 门控 + 推送/占位的共用主体（onSeriesLoaded
   // 实时路径与 activate 惰性补取路径均走这里）
   void applyVolume();
 

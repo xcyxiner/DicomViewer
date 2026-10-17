@@ -36,7 +36,8 @@ public:
   void assignViewToSlot(int slot, int viewIndex);
   void setFocusedSlot(int slot);
 
-  // 视图模式（View 菜单）：决定哪些面板参与槽位分配，默认仅 2D
+  // 视图模式（View 菜单）：决定哪些面板参与槽位分配，默认仅 2D；
+  // 切 Mpr3d 强制 Grid 四格、回 TwoDOnly 强制 Single
   void setViewMode(ViewMode mode);
 
   LayoutMode layoutMode() const { return m_layoutMode; }
@@ -78,8 +79,6 @@ private:
   int m_focusedSlot = 0;
   LayoutMode m_layoutMode = LayoutMode::Single;
   ViewMode m_viewMode = ViewMode::TwoDOnly;  // 默认：仅 2D
-  // 离开分屏模式时记住的槽位指派，回到分屏时恢复
-  QVector<int> m_splitAssignments = {-1, -1, -1, -1};
 
   QGridLayout* m_gridLayout = nullptr;
 

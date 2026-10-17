@@ -7,6 +7,7 @@
 #include "infrastructure/dicom_io/IDicomReader.h"
 #include "infrastructure/rendering/IImageRenderer.h"
 #include "infrastructure/rendering/IMprRenderer.h"
+#include "infrastructure/rendering/IVolumeRenderer.h"
 #include "infrastructure/task/ITaskQueue.h"
 
 ServiceContainer::ServiceContainer() = default;
@@ -39,6 +40,8 @@ template void ServiceContainer::registerInstance<IFrameCache>(
     std::shared_ptr<IFrameCache>);
 template void ServiceContainer::registerInstance<IMprRenderer>(
     std::shared_ptr<IMprRenderer>);
+template void ServiceContainer::registerInstance<IVolumeRenderer>(
+    std::shared_ptr<IVolumeRenderer>);
 
 template std::shared_ptr<IImageRenderer>
 ServiceContainer::resolve<IImageRenderer>() const;
@@ -50,3 +53,5 @@ template std::shared_ptr<IFrameCache> ServiceContainer::resolve<IFrameCache>()
     const;
 template std::shared_ptr<IMprRenderer> ServiceContainer::resolve<IMprRenderer>()
     const;
+template std::shared_ptr<IVolumeRenderer>
+ServiceContainer::resolve<IVolumeRenderer>() const;

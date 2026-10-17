@@ -78,7 +78,23 @@ gtest_discover_tests(MprPanel_test
     PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen"
 )
 
-# 视图模式（View 菜单）: 默认仅 2D / 槽位分配 / 分屏指派记忆 /
+# 3D 体绘制面板 (U6): 注册名与角色 / 空体占位 / N=1 单层占位 /
+# loadFiles no-op / WW-WC 广播链 / 模式切换补调 activate
+add_executable(VolumePanel_test
+    VolumePanel_test.cpp
+)
+if(COMMAND _deploy_qt_plugins)
+    _deploy_qt_plugins(VolumePanel_test)
+endif()
+target_link_libraries(VolumePanel_test PRIVATE
+    GTest::gtest_main
+    dicom_core
+)
+gtest_discover_tests(VolumePanel_test
+    PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen"
+)
+
+# 视图模式（View 菜单）: 默认仅 2D / Mpr3d 四格与强制布局 /
 # 越权分配忽略 / 注册时机 / 信号恰发一次
 add_executable(ViewMode_test
     ViewMode_test.cpp
