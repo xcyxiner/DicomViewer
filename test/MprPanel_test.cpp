@@ -190,9 +190,9 @@ TEST(MprPanelBehavior, EachPanelBindsOnlyItsOwnPlane)
   EXPECT_TRUE(fixture.mprRenderer->boundPlanes[1]);
 }
 
-// 分屏 + 2x2：三个平面面板占三个槽位、与 2D 组成四格（注册序即默认
-// 槽序：2D → 轴 → 冠 → 矢）。
-TEST(MprPanelLayout, SplitGridDistributesThreePlanesAcrossSlots)
+// MPR + 3D 模式：强制 2x2，三个平面面板按注册序占槽 0-2，2D 让位；
+// 本测试未注册 3D 面板 → 槽 3 为空占位。
+TEST(MprPanelLayout, Mpr3dGridDistributesThreePlanesAcrossSlots)
 {
   MprFixture fixture;
   GUIWindow window;
@@ -208,18 +208,19 @@ TEST(MprPanelLayout, SplitGridDistributesThreePlanesAcrossSlots)
   window.registerView(&axial);
   window.registerView(&coronal);
   window.registerView(&sagittal);
-  window.setViewMode(ViewMode::Split);
-  window.setGridLayout(LayoutMode::Grid);
+  window.setViewMode(ViewMode::Mpr3d);
 
-  EXPECT_EQ(window.panelInSlot(0), static_cast<IViewPanel*>(&center));
-  EXPECT_EQ(window.panelInSlot(1), static_cast<IViewPanel*>(&axial));
-  EXPECT_EQ(window.panelInSlot(2), static_cast<IViewPanel*>(&coronal));
-  EXPECT_EQ(window.panelInSlot(3), static_cast<IViewPanel*>(&sagittal));
+  EXPECT_EQ(window.layoutMode(), LayoutMode::Grid) << "进入 Mpr3d 应强制 2x2";
+  EXPECT_EQ(window.panelInSlot(0), static_cast<IViewPanel*>(&axial))
+      << "Mpr3d 下 2D 让位，轴位按注册序落槽 0";
+  EXPECT_EQ(window.panelInSlot(1), static_cast<IViewPanel*>(&coronal));
+  EXPECT_EQ(window.panelInSlot(2), static_cast<IViewPanel*>(&sagittal));
+  EXPECT_EQ(window.panelInSlot(3), nullptr) << "未注册 3D 面板 → 空槽";
 }
 
-// 仅 MPR + 1x1：槽位由 ViewMode 决定，轴位面板（注册序首个 MPR）落
-// 槽 0；1x1 只渲染槽 0，其余平面面板无槽可显示。
-TEST(MprPanelLayout, MprOnlySingleShowsAxialInSlot0)
+// MPR + 3D 下手动切 1x1：槽位仍由 ViewMode 决定（轴位在槽 0），
+// 布局菜单可把可见格数改回 Single（仅渲染槽 0）。
+TEST(MprPanelLayout, Mpr3dSingleShowsAxialInSlot0)
 {
   MprFixture fixture;
   GUIWindow window;
@@ -235,7 +236,8 @@ TEST(MprPanelLayout, MprOnlySingleShowsAxialInSlot0)
   window.registerView(&axial);
   window.registerView(&coronal);
   window.registerView(&sagittal);
-  window.setViewMode(ViewMode::MprOnly);
+  window.setViewMode(ViewMode::Mpr3d);
+  window.setGridLayout(LayoutMode::Single);
 
   EXPECT_EQ(window.panelInSlot(0), static_cast<IViewPanel*>(&axial));
 }
@@ -323,8 +325,9 @@ TEST(MprPanelBehavior, SingleFrameSeriesEntersPlaceholder)
 // res/series 夹具）已挪到 test/deprecated/MprPanel_test.cpp，待夹具
 // 回归后一并恢复。
 
-// 场景 8：分屏模式下已注册但 Single 布局不可见的 MprPanel，切 1x2 后
-// refreshLayout 补调 activate 恰一次（KTD8）。
+// 场景 8：仅 2D 下已注册但不可见的 MprPanel，切 Mpr3d（强制 Grid →
+// 获槽可见）后 refreshLayout 补调 activate 恰一次（KTD8）；后续布局
+// 重排对可见面板再次补调（幂等重入）。
 TEST(MprPanelLayout, LayoutSwitchActivatesMprExactlyOnce)
 {
   MprFixture fixture;
@@ -332,17 +335,20 @@ TEST(MprPanelLayout, LayoutSwitchActivatesMprExactlyOnce)
   GUICenter center(&fixture.viewModel);
   CountingMprPanel mpr(
       &fixture.viewModel, fixture.mprRenderer, IMprRenderer::kPlaneAxial);
-  // 仅 2D 下注册 → 进分屏：MPR 得槽 1，Single 下仍不可见
+  // 仅 2D 下注册 → MPR 不占槽不可见
   window.setViewMode(ViewMode::TwoDOnly);
   window.registerView(&center);
   window.registerView(&mpr);
-  window.setViewMode(ViewMode::Split);
 
-  EXPECT_EQ(mpr.activateCount, 0) << "Single 布局下 MPR 槽位不可见，不应激活";
+  EXPECT_EQ(mpr.activateCount, 0) << "仅 2D 下 MPR 不占槽，不应激活";
+
+  window.setViewMode(ViewMode::Mpr3d);
+
+  EXPECT_EQ(mpr.activateCount, 1) << "refreshLayout 应恰好补调 activate 一次";
 
   window.setGridLayout(LayoutMode::Horizontal);
 
-  EXPECT_EQ(mpr.activateCount, 1) << "refreshLayout 应恰好补调 activate 一次";
+  EXPECT_EQ(mpr.activateCount, 2) << "布局重排应对可见面板再次补调";
 }
 
 int main(int argc, char** argv)

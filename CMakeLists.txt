@@ -94,6 +94,16 @@ if(AUTO_TESTING)
 endif()
 target_link_libraries(DicomViewer_exe PRIVATE ${COMMON_LIBS})
 
+# VTK 对象工厂 autoinit（须在 target_link_libraries 之后、只挂最终可
+# 执行目标）。缺它则 vtkRenderingVolumeOpenGL2 的 override 未注册，
+# vtkSmartVolumeMapper 构造内触发的 vtkGPUVolumeRayCastMapper::New()
+# 返回 nullptr（"no override found"）——3D 体绘制的硬前置。测试目标
+# 不加：测试全用 Fake renderer，不构造 VTK 体绘制管线。
+vtk_module_autoinit(
+    TARGETS DicomViewer_exe
+    MODULES ${VTK_LIBRARIES}
+)
+
 # ---- DCMTK 字典路径 ----
 if(UNIX)
     set(DCM_DICT_PATH "${CMAKE_BINARY_DIR}/vcpkg_installed/${VCPKG_TARGET_TRIPLET}/share/dcmtk/dicom.dic")
